@@ -397,13 +397,12 @@ function ProjectCard({ project, index }) {
       href={project.link}
       target={project.link === "#" ? undefined : "_blank"}
       rel="noreferrer"
-      initial={isSmallScreen ? false : { opacity: 0, y: 40 }}
-      animate={isSmallScreen ? { opacity: 1, y: 0 } : undefined}
-      whileInView={isSmallScreen ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={isSmallScreen ? undefined : { duration: 0.65, delay: index * 0.08 }}
+      initial={{ opacity: 0, y: isSmallScreen ? 18 : 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: isSmallScreen ? 0.18 : 0.25, margin: isSmallScreen ? "0px 0px -24px 0px" : "-80px" }}
+      transition={{ duration: isSmallScreen ? 0.45 : 0.65, delay: isSmallScreen ? index * 0.04 : index * 0.08, ease: "easeOut" }}
       whileHover={isSmallScreen ? undefined : { y: -12, scale: 1.015 }}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-all duration-500 hover:border-sky-300/35 hover:bg-white/[0.055] hover:shadow-sky-950/30"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-colors duration-500 hover:border-sky-300/35 hover:bg-white/[0.055] hover:shadow-sky-950/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.16),transparent_45%)]" />
@@ -1363,26 +1362,24 @@ function Toybox() {
               <h3 className="mt-2 text-xl font-black sm:text-2xl">{modeCopy[activeMode].title}</h3>
               <p className="mt-2 max-w-xl text-xs leading-5 text-slate-400 sm:text-sm">{modeCopy[activeMode].description}</p>
             </div>
-            <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-              <div className="flex min-w-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {modeNames.map((modeName) => (
-                  <button
-                    key={modeName}
-                    type="button"
-                    onClick={() => {
-                      setActiveMode(modeName);
-                      setResetSignal((value) => value + 1);
-                    }}
-                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
-                      activeMode === modeName
-                        ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
-                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                    }`}
-                  >
-                    {modeName}
-                  </button>
-                ))}
-              </div>
+            <div className="flex shrink-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {modeNames.map((modeName) => (
+                <button
+                  key={modeName}
+                  type="button"
+                  onClick={() => {
+                    setActiveMode(modeName);
+                    setResetSignal((value) => value + 1);
+                  }}
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
+                    activeMode === modeName
+                      ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  {modeName}
+                </button>
+              ))}
               <button
                 type="button"
                 onClick={() => setResetSignal((value) => value + 1)}
@@ -1482,34 +1479,52 @@ function Contact() {
 function ProgressBar() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  return <motion.div style={{ scaleX }} className="fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-sky-300 via-white to-blue-400" />;
+  return <motion.div style={{ scaleX }} className="fixed left-0 right-0 top-0 z-[60] hidden h-1 origin-left bg-gradient-to-r from-sky-300 via-white to-blue-400 sm:block" />;
 }
 
 export default function App() {
   useEffect(() => {
-    const sectionIds = ["home", "work", "skills", "toybox", "experience", "contact"];
-    sectionIds.forEach((id) => {
-      const section = document.getElementById(id);
-      if (section) section.style.scrollMarginTop = "96px";
-    });
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlScrollBehavior = html.style.scrollBehavior;
+    const previousHtmlBg = html.style.backgroundColor;
+    const previousBodyBg = body.style.backgroundColor;
+    const previousBodyMargin = body.style.margin;
+    const previousBodyOverscroll = body.style.overscrollBehaviorY;
 
-    const handleHashClick = (event) => {
-      const link = event.target.closest?.('a[href^="#"]');
+    html.style.scrollBehavior = "smooth";
+    html.style.backgroundColor = "#05070c";
+    body.style.backgroundColor = "#05070c";
+    body.style.margin = "0";
+    body.style.overscrollBehaviorY = "none";
+
+    const handleAnchorClick = (event) => {
+      const link = event.target.closest('a[href^="#"]');
       if (!link) return;
+
       const hash = link.getAttribute("href");
       if (!hash || hash === "#") return;
+
       const target = document.querySelector(hash);
       if (!target) return;
 
       event.preventDefault();
-      const offset = window.innerWidth < 768 ? 88 : 96;
-      const top = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: "smooth" });
+      const navbarOffset = window.innerWidth < 768 ? 88 : 104;
+      const top = target.getBoundingClientRect().top + window.scrollY - navbarOffset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
       window.history.pushState(null, "", hash);
     };
 
-    document.addEventListener("click", handleHashClick);
-    return () => document.removeEventListener("click", handleHashClick);
+    document.addEventListener("click", handleAnchorClick);
+
+    return () => {
+      document.removeEventListener("click", handleAnchorClick);
+      html.style.scrollBehavior = previousHtmlScrollBehavior;
+      html.style.backgroundColor = previousHtmlBg;
+      body.style.backgroundColor = previousBodyBg;
+      body.style.margin = previousBodyMargin;
+      body.style.overscrollBehaviorY = previousBodyOverscroll;
+    };
   }, []);
 
   return (
