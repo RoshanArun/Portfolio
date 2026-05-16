@@ -84,7 +84,7 @@ const experience = [
   },
 ];
 
-const sectionVisibilityClass = "[content-visibility:auto] [contain-intrinsic-size:900px]";
+const sectionVisibilityClass = "";
 const springResetTransition = { type: "spring", stiffness: 170, damping: 20 };
 const smoothResetDuration = 650;
 
@@ -178,7 +178,7 @@ function HologramCore() {
       initial={{ opacity: 0, scale: 0.92, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.35, ease: "easeOut" }}
-      className="relative mx-auto mt-10 h-[360px] w-full max-w-xl sm:h-[460px] lg:mt-0 lg:h-[620px]"
+      className="relative mx-auto mt-20 h-[360px] w-full max-w-xl sm:mt-10 sm:h-[460px] lg:mt-0 lg:h-[620px]"
     >
       <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-3xl" />
 
@@ -397,7 +397,7 @@ function ProjectCard({ project, index }) {
       rel="noreferrer"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.65, delay: index * 0.08 }}
       whileHover={{ y: -12, scale: 1.015 }}
       className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-all duration-500 hover:border-sky-300/35 hover:bg-white/[0.055] hover:shadow-sky-950/30"
@@ -738,16 +738,20 @@ function ConstellationsPlayground({ resetSignal }) {
   const startDrag = (event, point) => {
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     const rect = boardRef.current.getBoundingClientRect();
 
     const move = (moveEvent) => updatePoint(point.id, moveEvent.clientX, moveEvent.clientY, rect);
     const stop = () => {
+      event.currentTarget.releasePointerCapture?.(event.pointerId);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
     };
 
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const sortedPoints = useMemo(() => [...points].sort((a, b) => a.id - b.id), [points]);
@@ -776,7 +780,7 @@ function ConstellationsPlayground({ resetSignal }) {
         </button>
       </div>
 
-      <div ref={boardRef} onClick={handleBoardClick} className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 p-3 [touch-action:none] sm:h-[420px] sm:rounded-[2rem] sm:p-5 lg:h-full lg:min-h-[360px]">
+      <div ref={boardRef} onClick={handleBoardClick} className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 p-3 [touch-action:pan-y] sm:h-[420px] sm:rounded-[2rem] sm:p-5 lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(125,211,252,0.13),transparent_18%),radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.08),transparent_24%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible opacity-90">
           {sortedPoints.slice(1).map((point, index) => {
@@ -809,7 +813,7 @@ function ConstellationsPlayground({ resetSignal }) {
               initial={false}
               animate={{ left: pixel.x, top: pixel.y }}
               transition={resetAnimating ? springResetTransition : { duration: 0 }}
-              className="absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border border-sky-200/40 bg-sky-300/15 text-[10px] font-black text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.45)] backdrop-blur active:cursor-grabbing"
+              className="absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border border-sky-200/40 bg-sky-300/15 text-[10px] font-black text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.45)] backdrop-blur active:cursor-grabbing [touch-action:none]"
             >
               {index + 1}
             </motion.button>
@@ -950,6 +954,7 @@ function SystemsPlayground({ resetSignal }) {
   const startNodeDrag = (event, node) => {
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     const rect = boardRef.current.getBoundingClientRect();
     dragState.current = { moved: false, id: node.id, startX: event.clientX, startY: event.clientY, rect };
 
@@ -960,14 +965,17 @@ function SystemsPlayground({ resetSignal }) {
     };
 
     const stop = () => {
+      event.currentTarget.releasePointerCapture?.(event.pointerId);
       if (!dragState.current.moved) pickNode(node.id);
       dragState.current = { moved: false, id: null, startX: 0, startY: 0, rect: null };
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
     };
 
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const addSystem = () => {
@@ -1162,7 +1170,7 @@ function SystemsPlayground({ resetSignal }) {
         </div>
       </div>
 
-      <div ref={boardRef} data-systems-board className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 [touch-action:none] sm:h-[430px] sm:rounded-[2rem] lg:h-full lg:min-h-[360px]">
+      <div ref={boardRef} data-systems-board className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 [touch-action:pan-y] sm:h-[430px] sm:rounded-[2rem] lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(125,211,252,0.10),transparent_20%),radial-gradient(circle_at_72%_70%,rgba(255,255,255,0.07),transparent_25%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden opacity-80">
           {linkSegments.map((linkItem, index) => (
@@ -1332,7 +1340,7 @@ function Toybox() {
         <motion.div
           initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.7 }}
           className={`relative mx-auto flex flex-col overflow-visible rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/40 backdrop-blur-xl sm:rounded-[2.5rem] sm:p-6 ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
           style={{
@@ -1354,30 +1362,32 @@ function Toybox() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.035)_1px,transparent_1px)] bg-[size:54px_54px] opacity-70" />
           </div>
 
-          <div className="relative z-10 flex shrink-0 flex-col gap-3 border-b border-white/10 pb-4 lg:flex-row lg:items-center lg:justify-between lg:pb-5">
+          <div className="relative z-20 flex shrink-0 flex-col gap-3 border-b border-white/10 pb-4 lg:flex-row lg:items-center lg:justify-between lg:pb-5">
             <div className="min-w-0">
               <p className="font-mono text-xs uppercase tracking-[0.28em] text-sky-300">{activeMode}</p>
               <h3 className="mt-2 text-xl font-black sm:text-2xl">{modeCopy[activeMode].title}</h3>
               <p className="mt-2 max-w-xl text-xs leading-5 text-slate-400 sm:text-sm">{modeCopy[activeMode].description}</p>
             </div>
-            <div className="flex shrink-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {modeNames.map((modeName) => (
-                <button
-                  key={modeName}
-                  type="button"
-                  onClick={() => {
-                    setActiveMode(modeName);
-                    setResetSignal((value) => value + 1);
-                  }}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
-                    activeMode === modeName
-                      ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
-                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                  }`}
-                >
-                  {modeName}
-                </button>
-              ))}
+            <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <div className="flex min-w-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {modeNames.map((modeName) => (
+                  <button
+                    key={modeName}
+                    type="button"
+                    onClick={() => {
+                      setActiveMode(modeName);
+                      setResetSignal((value) => value + 1);
+                    }}
+                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
+                      activeMode === modeName
+                        ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
+                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {modeName}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => setResetSignal((value) => value + 1)}
@@ -1482,8 +1492,29 @@ function ProgressBar() {
 
 export default function App() {
   useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-    return () => { document.documentElement.style.scrollBehavior = "auto"; };
+    const sectionIds = ["home", "work", "skills", "toybox", "experience", "contact"];
+    sectionIds.forEach((id) => {
+      const section = document.getElementById(id);
+      if (section) section.style.scrollMarginTop = "96px";
+    });
+
+    const handleHashClick = (event) => {
+      const link = event.target.closest?.('a[href^="#"]');
+      if (!link) return;
+      const hash = link.getAttribute("href");
+      if (!hash || hash === "#") return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+
+      event.preventDefault();
+      const offset = window.innerWidth < 768 ? 88 : 96;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+      window.history.pushState(null, "", hash);
+    };
+
+    document.addEventListener("click", handleHashClick);
+    return () => document.removeEventListener("click", handleHashClick);
   }, []);
 
   return (
