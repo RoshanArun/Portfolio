@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useAnimation } from "framer-motion";
 import { ArrowRight, Mail, ExternalLink, Code2, Smartphone, Sparkles, Layers, Rocket, Menu, X } from "lucide-react";
 
@@ -486,7 +486,7 @@ function Skills() {
   );
 }
 
-function DraggableToy({ resetSignal, initial, className = "", children }) {
+function DraggableToy({ resetSignal, initial, className = "", children, dragMomentum = true, motionStyle = {}, whileHover = { scale: 1.04 } }) {
   const controls = useAnimation();
 
   useEffect(() => {
@@ -501,323 +501,638 @@ function DraggableToy({ resetSignal, initial, className = "", children }) {
   return (
     <motion.div
       drag
-      dragMomentum
-      dragElastic={0.18}
-      dragTransition={{ power: 0.35, timeConstant: 320 }}
+      dragMomentum={dragMomentum}
+      dragElastic={0.2}
+      dragTransition={{ power: 0.65, timeConstant: 520, bounceStiffness: 160, bounceDamping: 14 }}
       animate={controls}
-      whileDrag={{ scale: 1.08, zIndex: 80, rotate: 2 }}
-      whileHover={{ scale: 1.04 }}
+      whileDrag={{ scale: 1.08, zIndex: 120, rotate: 2 }}
+      whileHover={whileHover}
       className={`absolute cursor-grab select-none active:cursor-grabbing [touch-action:none] ${className}`}
-      style={{ left: initial.left, top: initial.top }}
+      style={{ left: initial.left, top: initial.top, ...motionStyle }}
     >
       {children}
     </motion.div>
+  );
+}
+
+function MotionToyFace({ toy }) {
+  if (toy.kind === "magnet") {
+    return (
+      <div className="relative h-full w-full overflow-hidden rounded-[1.5rem] p-3">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">Magnet</div>
+        <div className="relative mt-3 h-11">
+          <motion.span
+            animate={{ x: [0, 34, 0], scale: [1, 1.18, 1] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-0 top-3 h-6 w-6 rounded-full border border-sky-200/35 bg-sky-300/20 shadow-[0_0_24px_rgba(125,211,252,0.45)]"
+          />
+          <motion.span
+            animate={{ x: [0, -34, 0], scale: [1, 1.18, 1] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute right-0 top-3 h-6 w-6 rounded-full border border-white/30 bg-white/10 shadow-[0_0_24px_rgba(255,255,255,0.24)]"
+          />
+          <motion.div
+            animate={{ opacity: [0.15, 0.75, 0.15], scaleX: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-7 right-7 top-6 h-px origin-center bg-sky-200/60"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (toy.kind === "orbit") {
+    return (
+      <div className="relative grid h-full w-full place-items-center">
+        <motion.span animate={{ rotate: 360 }} transition={{ duration: 4.5, repeat: Infinity, ease: "linear" }} className="absolute inset-2 rounded-full border border-dashed border-sky-200/35">
+          <span className="absolute -top-1 left-1/2 h-3 w-3 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.95)]" />
+        </motion.span>
+        <motion.span animate={{ rotate: -360 }} transition={{ duration: 7, repeat: Infinity, ease: "linear" }} className="absolute inset-8 rounded-full border border-white/15">
+          <span className="absolute -bottom-1 left-1/3 h-2.5 w-2.5 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.95)]" />
+        </motion.span>
+        <span className="text-sm">Orbit</span>
+      </div>
+    );
+  }
+
+  if (toy.kind === "ease") {
+    return (
+      <div className="w-40">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-sky-200/70"><span>Ease</span><span>curve</span></div>
+        <div className="mt-3 h-1 rounded-full bg-white/10">
+          <motion.div animate={{ x: [0, 112, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }} className="h-2.5 w-2.5 -translate-y-1 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.9)]" />
+        </div>
+      </div>
+    );
+  }
+
+  if (toy.kind === "signal") {
+    return (
+      <div className="min-w-28">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">Signal</div>
+        <div className="mt-3 flex h-10 items-end gap-1.5">
+          {[22, 44, 30, 56, 38, 48].map((height, index) => (
+            <motion.span
+              key={index}
+              animate={{ height: [height, 10 + ((height + index * 11) % 52), height] }}
+              transition={{ duration: 1.2 + index * 0.08, repeat: Infinity, ease: "easeInOut", delay: index * 0.04 }}
+              className="w-3 rounded-full bg-sky-300/30 ring-1 ring-sky-200/25"
+              style={{ height }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative grid h-full w-full place-items-center overflow-hidden rounded-full">
+      {[0, 1, 2].map((ring) => (
+        <motion.span
+          key={ring}
+          animate={{ scale: [0.15, 1.2], opacity: [0.75, 0] }}
+          transition={{ duration: 2.1, repeat: Infinity, ease: "easeOut", delay: ring * 0.45 }}
+          className="absolute h-16 w-16 rounded-full border border-sky-200/45"
+        />
+      ))}
+      <span className="relative z-10 text-xs font-black">Ripple</span>
+    </div>
   );
 }
 
 function MotionPlayground({ resetSignal }) {
   const toys = [
-    { label: "Spring", left: "9%", top: "18%", shape: "pill" },
-    { label: "Orbit", left: "71%", top: "17%", shape: "orb" },
-    { label: "Ease", left: "39%", top: "36%", shape: "chip" },
-    { label: "Velocity", left: "13%", top: "70%", shape: "chip" },
-    { label: "Hover", left: "72%", top: "68%", shape: "pill" },
+    { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
+    { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
+    { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
+    { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
+    { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
   ];
 
   const toyClass = (shape) => {
     if (shape === "orb") {
-      return "grid h-24 w-24 place-items-center rounded-full border border-sky-300/20 bg-sky-300/10 text-xs font-black uppercase tracking-[0.14em] text-sky-100 shadow-2xl shadow-sky-950/30 backdrop-blur";
+      return "grid h-[7.65rem] w-[7.65rem] place-items-center rounded-full border border-sky-300/20 bg-sky-300/10 text-[11px] font-black uppercase tracking-[0.14em] text-sky-100 shadow-2xl shadow-sky-950/30 backdrop-blur";
     }
-    if (shape === "pill") {
-      return "rounded-full border border-sky-300/20 bg-[#0b1220]/90 px-6 py-4 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+    if (shape === "panel") {
+      return "h-[5.1rem] w-[8.5rem] rounded-[1.5rem] border border-sky-300/20 bg-[#0b1220]/90 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
     }
-    return "rounded-2xl border border-sky-300/20 bg-[#0b1220]/90 px-6 py-4 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+    if (shape === "wide") {
+      return "rounded-2xl border border-sky-300/20 bg-[#0b1220]/90 px-5 py-4 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+    }
+    if (shape === "bars") {
+      return "rounded-[1.7rem] border border-sky-300/20 bg-[#0b1220]/90 px-3.5 py-3 text-[11px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+    }
+    return "grid h-[5.75rem] w-[5.75rem] place-items-center rounded-full border border-sky-300/20 bg-[#0b1220]/90 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
   };
 
   return (
-    <div className="relative z-10 mt-6 h-[500px] overflow-visible rounded-[2rem] border border-white/10 bg-black/20">
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-sky-300/15" />
-      <motion.div animate={{ rotate: -360 }} transition={{ duration: 54, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
+    <div className="relative z-10 h-full min-h-[430px] overflow-visible rounded-[2rem] border border-white/10 bg-black/20">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-[43%] top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-sky-300/15" />
+      <motion.div animate={{ rotate: -360 }} transition={{ duration: 54, repeat: Infinity, ease: "linear" }} className="absolute left-[43%] top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
 
       {toys.map((toy) => (
         <DraggableToy key={toy.label} resetSignal={resetSignal} initial={{ left: toy.left, top: toy.top }} className={toyClass(toy.shape)}>
-          {toy.label}
+          <MotionToyFace toy={toy} />
         </DraggableToy>
       ))}
 
       <DraggableToy
         resetSignal={resetSignal}
-        initial={{ left: "18%", top: "44%" }}
-        className="w-[62%] max-w-xl rounded-2xl border border-white/10 bg-[#080c14]/85 p-6 font-mono text-sm text-slate-300 shadow-2xl shadow-black/30 backdrop-blur"
+        initial={{ left: "21%", top: "40%" }}
+        className="w-[44%] max-w-md rounded-2xl border border-white/10 bg-[#080c14]/85 p-5 font-mono text-sm text-slate-300 shadow-2xl shadow-black/30 backdrop-blur"
       >
-        <p><span className="text-sky-300">motion</span>.play(&#123; spring, velocity, hover &#125;);</p>
+        <p><span className="text-sky-300">motion</span>.play(&#123; magnet, orbit, ease, signal, ripple &#125;);</p>
       </DraggableToy>
     </div>
   );
 }
 
-function ColorMixerPlayground({ resetSignal }) {
-  const [accent, setAccent] = useState(55);
-  const [density, setDensity] = useState(5);
-  const [rounded, setRounded] = useState(28);
-
-  useEffect(() => {
-    setAccent(55);
-    setDensity(5);
-    setRounded(28);
-  }, [resetSignal]);
-
-  const swatches = useMemo(
-    () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        id: i,
-        left: `${8 + ((i * 17) % 84)}%`,
-        top: `${12 + ((i * 29) % 74)}%`,
-        delay: i * 0.06,
-      })),
+function ConstellationsPlayground({ resetSignal }) {
+  const boardRef = useRef(null);
+  const defaultPoints = useMemo(
+    () => [
+      { id: 1, x: 0.22, y: 0.28 },
+      { id: 2, x: 0.46, y: 0.16 },
+      { id: 3, x: 0.72, y: 0.36 },
+      { id: 4, x: 0.62, y: 0.74 },
+      { id: 5, x: 0.32, y: 0.66 },
+    ],
     []
   );
+  const [points, setPoints] = useState(defaultPoints);
+  const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+
+  useEffect(() => {
+    setPoints(defaultPoints);
+  }, [resetSignal, defaultPoints]);
+
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const updateSize = () => {
+      const rect = board.getBoundingClientRect();
+      if (rect.width && rect.height) setBoardSize({ width: rect.width, height: rect.height });
+    };
+
+    updateSize();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateSize);
+      return () => window.removeEventListener("resize", updateSize);
+    }
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(board);
+    return () => observer.disconnect();
+  }, []);
+
+  const clampRatioPoint = (x, y) => ({
+    x: Math.min(Math.max(x, 0.04), 0.96),
+    y: Math.min(Math.max(y, 0.06), 0.94),
+  });
+
+  const ratioToPixels = (point) => ({
+    x: point.x * boardSize.width,
+    y: point.y * boardSize.height,
+  });
+
+  const updatePoint = (id, clientX, clientY, rectOverride) => {
+    const rect = rectOverride || boardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const next = clampRatioPoint((clientX - rect.left) / rect.width, (clientY - rect.top) / rect.height);
+    setPoints((current) => current.map((point) => (point.id === id ? { ...point, ...next } : point)));
+  };
+
+  const handleBoardClick = (event) => {
+    if (event.target.closest("[data-constellation-point]")) return;
+    const rect = boardRef.current.getBoundingClientRect();
+    const next = clampRatioPoint((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+    setPoints((current) => [...current, { id: Date.now(), ...next }]);
+  };
+
+  const startDrag = (event, point) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = boardRef.current.getBoundingClientRect();
+
+    const move = (moveEvent) => updatePoint(point.id, moveEvent.clientX, moveEvent.clientY, rect);
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  };
+
+  const sortedPoints = [...points].sort((a, b) => a.id - b.id);
 
   return (
-    <div className="relative z-10 mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">visual mixer</p>
-        <h4 className="mt-3 text-2xl font-black">Tune the interface</h4>
+    <div className="relative z-10 grid h-full min-h-0 gap-6 lg:grid-cols-[0.76fr_1.24fr]">
+      <div className="systems-scroll min-h-0 overflow-auto rounded-[2rem] border border-white/10 bg-black/20 p-5">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">constellations</p>
+        <h4 className="mt-3 text-2xl font-black">Draw your own star map</h4>
         <p className="mt-3 leading-7 text-slate-400">
-          Use the sliders to change the feel of the preview. This is a tiny design-control panel instead of a simple layout grid.
+          Click the sky to drop a point. Drag any star to redesign the constellation. The map scales with the playbox size.
         </p>
-
-        <div className="mt-8 space-y-6">
-          {[
-            ["accent", accent, setAccent, 0, 100],
-            ["density", density, setDensity, 1, 10],
-            ["radius", rounded, setRounded, 4, 40],
-          ].map(([label, value, setter, min, max]) => (
-            <div key={label}>
-              <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
-                <span>{label}</span>
-                <span className="text-sky-300">{value}</span>
-              </div>
-              <input
-                type="range"
-                min={min}
-                max={max}
-                value={value}
-                onChange={(event) => setter(Number(event.target.value))}
-                className="w-full accent-sky-300"
-              />
-            </div>
-          ))}
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-4 font-mono text-sm text-slate-300">
+          <span className="text-sky-300">stars</span>.connect({points.length});
         </div>
-      </div>
-
-      <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <motion.div
-          animate={{ scale: [1, 1.04 + density * 0.01, 1], opacity: [0.22, 0.5, 0.22] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-          style={{ backgroundColor: `hsla(${190 + accent}, 90%, 60%, 0.16)` }}
-        />
-
-        {swatches.slice(0, density + 8).map((swatch) => (
-          <motion.div
-            key={swatch.id}
-            className="absolute border border-white/10 bg-white/[0.055] backdrop-blur"
-            style={{ left: swatch.left, top: swatch.top, width: 42 + accent * 0.22, height: 42 + density * 4, borderRadius: rounded }}
-            animate={{ y: [0, -8, 0], opacity: [0.45, 0.9, 0.45] }}
-            transition={{ duration: 4, delay: swatch.delay, repeat: Infinity, ease: "easeInOut" }}
-          />
-        ))}
-
-        <motion.div
-          layout
-          className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-[#080c14]/80 p-5 backdrop-blur"
-          style={{ borderRadius: rounded }}
+        <button
+          type="button"
+          onClick={() => setPoints([])}
+          className="mt-4 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-200 transition hover:bg-white/10"
         >
-          <p className="font-mono text-sm text-slate-300">
-            <span className="text-sky-300">theme</span>.mix(&#123; accent: {accent}, density: {density}, radius: {rounded} &#125;)
-          </p>
-        </motion.div>
+          Clear stars
+        </button>
+      </div>
+
+      <div ref={boardRef} onClick={handleBoardClick} className="relative h-full min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 p-5 [touch-action:none]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(125,211,252,0.13),transparent_18%),radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.08),transparent_24%)]" />
+        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible opacity-90">
+          {sortedPoints.slice(1).map((point, index) => {
+            const previous = sortedPoints[index];
+            const a = ratioToPixels(previous);
+            const b = ratioToPixels(point);
+            return (
+              <motion.line
+                key={`${previous.id}-${point.id}`}
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke="rgba(125,211,252,0.42)"
+                strokeWidth="2"
+                strokeDasharray="8 10"
+                animate={{ strokeDashoffset: [0, -36] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: "linear" }}
+              />
+            );
+          })}
+        </svg>
+
+        {points.map((point, index) => {
+          const pixel = ratioToPixels(point);
+          return (
+            <button
+              key={point.id}
+              type="button"
+              data-constellation-point
+              onPointerDown={(event) => startDrag(event, point)}
+              className="absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border border-sky-200/40 bg-sky-300/15 text-[10px] font-black text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.45)] backdrop-blur active:cursor-grabbing"
+              style={{ left: pixel.x, top: pixel.y }}
+            >
+              {index + 1}
+            </button>
+          );
+        })}
+
+        {points.length === 0 && <p className="absolute inset-x-0 top-1/2 text-center text-sm text-slate-400">Click anywhere to start a new constellation.</p>}
       </div>
     </div>
   );
 }
 
-function GravityPlayground({ resetSignal }) {
-  const [gravity, setGravity] = useState(4);
-  const balls = useMemo(
-    () =>
-      Array.from({ length: 8 }, (_, i) => ({
-        id: i,
-        left: `${10 + ((i * 13) % 78)}%`,
-        size: 34 + ((i * 11) % 42),
-        delay: i * 0.12,
-      })),
-    []
-  );
-
-  useEffect(() => {
-    setGravity(4);
-  }, [resetSignal]);
-
+function SystemsNode({ node, pixel, onStartDrag, selected, children }) {
   return (
-    <div className="relative z-10 mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">gravity field</p>
-        <h4 className="mt-3 text-2xl font-black">Change the pull</h4>
-        <p className="mt-3 leading-7 text-slate-400">
-          Adjust gravity and watch the objects fall with different timing. You can also drag the capsules manually.
-        </p>
-        <div className="mt-8">
-          <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
-            <span>gravity</span>
-            <span className="text-sky-300">{gravity}</span>
-          </div>
-          <input min="1" max="8" type="range" value={gravity} onChange={(e) => setGravity(Number(e.target.value))} className="w-full accent-sky-300" />
-        </div>
-      </div>
-
-      <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <div className="absolute bottom-7 left-7 right-7 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" />
-        {balls.map((ball) => (
-          <motion.div
-            key={`${resetSignal}-${ball.id}`}
-            drag
-            dragMomentum
-            dragElastic={0.18}
-            className="absolute cursor-grab rounded-full border border-sky-300/20 bg-sky-300/10 shadow-2xl shadow-sky-950/30 backdrop-blur active:cursor-grabbing [touch-action:none]"
-            style={{ left: ball.left, width: ball.size, height: ball.size }}
-            animate={{ y: [0, 330 - ball.size, 330 - ball.size - gravity * 10, 330 - ball.size] }}
-            transition={{ duration: Math.max(1, 3.4 - gravity * 0.22), delay: ball.delay, repeat: Infinity, ease: "easeInOut" }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SystemsNode({ node, resetSignal, onMove, children }) {
-  const controls = useAnimation();
-
-  useEffect(() => {
-    controls.start({
-      x: 0,
-      y: 0,
-      rotate: 0,
-      transition: { type: "spring", stiffness: 170, damping: 18 },
-    });
-    onMove(node.id, { x: node.x, y: node.y });
-  }, [resetSignal, controls]);
-
-  return (
-    <motion.div
-      drag
-      dragMomentum
-      dragElastic={0.18}
-      animate={controls}
-      onDrag={(event, info) => {
-        onMove(node.id, {
-          x: node.x + info.offset.x,
-          y: node.y + info.offset.y,
-        });
-      }}
-      onDragEnd={(event, info) => {
-        onMove(node.id, {
-          x: node.x + info.offset.x,
-          y: node.y + info.offset.y,
-        });
-      }}
-      whileDrag={{ scale: 1.08, zIndex: 80 }}
+    <motion.button
+      type="button"
+      onPointerDown={(event) => onStartDrag(event, node)}
       whileHover={{ scale: 1.04 }}
-      className="absolute grid h-24 w-24 cursor-grab select-none place-items-center rounded-full border border-sky-300/20 bg-[#0b1220]/90 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none]"
-      style={{ left: node.x - 48, top: node.y - 48 }}
+      whileTap={{ scale: 1.04 }}
+      className={`absolute z-10 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-3 text-center text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] ${
+        selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
+      }`}
+      style={{ left: pixel.x, top: pixel.y }}
     >
-      {children}
-    </motion.div>
+      <span className="line-clamp-2 leading-tight">{children}</span>
+    </motion.button>
   );
 }
 
 function SystemsPlayground({ resetSignal }) {
-  const initialNodes = useMemo(
+  const boardRef = useRef(null);
+  const defaultNodes = useMemo(
     () => [
-      { id: "ui", label: "UI", x: 140, y: 110 },
-      { id: "state", label: "State", x: 420, y: 80 },
-      { id: "api", label: "API", x: 700, y: 170 },
-      { id: "cpp", label: "C++", x: 265, y: 340 },
-      { id: "swift", label: "Swift", x: 625, y: 350 },
+      { id: "ui", label: "UI", x: 0.2, y: 0.22 },
+      { id: "state", label: "State", x: 0.43, y: 0.18 },
+      { id: "api", label: "API", x: 0.7, y: 0.32 },
+      { id: "cpp", label: "C++", x: 0.32, y: 0.72 },
+      { id: "swift", label: "Swift", x: 0.66, y: 0.74 },
     ],
     []
   );
 
-  const [nodePositions, setNodePositions] = useState(() =>
-    Object.fromEntries(initialNodes.map((node) => [node.id, { x: node.x, y: node.y }]))
+  const defaultLinks = useMemo(
+    () => [
+      ["ui", "state"],
+      ["state", "api"],
+      ["state", "cpp"],
+      ["cpp", "swift"],
+      ["swift", "api"],
+    ],
+    []
   );
 
+  const makePositions = (nodes) => Object.fromEntries(nodes.map((node) => [node.id, { x: node.x, y: node.y }]));
+  const [nodes, setNodes] = useState(defaultNodes);
+  const [nodePositions, setNodePositions] = useState(() => makePositions(defaultNodes));
+  const [links, setLinks] = useState(defaultLinks);
+  const [newSystemName, setNewSystemName] = useState("");
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+  const dragState = useRef({ moved: false, id: null, startX: 0, startY: 0, rect: null });
+
   useEffect(() => {
-    setNodePositions(Object.fromEntries(initialNodes.map((node) => [node.id, { x: node.x, y: node.y }])));
-  }, [resetSignal, initialNodes]);
+    setNodes(defaultNodes);
+    setNodePositions(makePositions(defaultNodes));
+    setLinks(defaultLinks);
+    setNewSystemName("");
+    setSelectedNodes([]);
+  }, [resetSignal, defaultNodes, defaultLinks]);
 
-  const updateNode = (id, position) => {
-    setNodePositions((current) => ({ ...current, [id]: position }));
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const updateSize = () => {
+      const rect = board.getBoundingClientRect();
+      if (rect.width && rect.height) setBoardSize({ width: rect.width, height: rect.height });
+    };
+
+    updateSize();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateSize);
+      return () => window.removeEventListener("resize", updateSize);
+    }
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(board);
+    return () => observer.disconnect();
+  }, []);
+
+  const clampRatioPoint = (x, y) => ({
+    x: Math.min(Math.max(x, 0.08), 0.92),
+    y: Math.min(Math.max(y, 0.1), 0.9),
+  });
+
+  const ratioToPixels = (position) => ({
+    x: position.x * boardSize.width,
+    y: position.y * boardSize.height,
+  });
+
+  const updateNodeFromClient = (id, clientX, clientY, rectOverride) => {
+    const rect = rectOverride || boardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const next = clampRatioPoint((clientX - rect.left) / rect.width, (clientY - rect.top) / rect.height);
+    setNodePositions((current) => ({ ...current, [id]: next }));
   };
 
-  const line = (from, to) => {
-    const a = nodePositions[from];
-    const b = nodePositions[to];
-    return { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+  const normalizeLink = (a, b) => [a, b].sort().join("::");
+
+  const toggleLink = (a, b) => {
+    if (!a || !b || a === b) return;
+    const key = normalizeLink(a, b);
+    setLinks((current) => {
+      const exists = current.some(([from, to]) => normalizeLink(from, to) === key);
+      if (exists) return current.filter(([from, to]) => normalizeLink(from, to) !== key);
+      return [...current, [a, b]];
+    });
   };
 
-  const links = [line("ui", "state"), line("state", "api"), line("state", "cpp"), line("cpp", "swift"), line("swift", "api")];
+  const pickNode = (id) => {
+    setSelectedNodes((current) => {
+      if (current.includes(id)) return current.filter((item) => item !== id);
+      const next = [...current, id].slice(-2);
+      if (next.length === 2) {
+        toggleLink(next[0], next[1]);
+        return [];
+      }
+      return next;
+    });
+  };
+
+  const startNodeDrag = (event, node) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = boardRef.current.getBoundingClientRect();
+    dragState.current = { moved: false, id: node.id, startX: event.clientX, startY: event.clientY, rect };
+
+    const move = (moveEvent) => {
+      const distance = Math.hypot(moveEvent.clientX - dragState.current.startX, moveEvent.clientY - dragState.current.startY);
+      if (distance > 3) dragState.current.moved = true;
+      updateNodeFromClient(node.id, moveEvent.clientX, moveEvent.clientY, rect);
+    };
+
+    const stop = () => {
+      if (!dragState.current.moved) pickNode(node.id);
+      dragState.current = { moved: false, id: null, startX: 0, startY: 0, rect: null };
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  };
+
+  const addSystem = () => {
+    const label = newSystemName.trim() || `System ${nodes.length + 1}`;
+    const id = `${label.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "system"}-${Date.now()}`;
+    const column = nodes.length % 3;
+    const row = Math.floor(nodes.length / 3) % 3;
+    const nextPosition = clampRatioPoint(0.2 + column * 0.26, 0.24 + row * 0.22);
+    const nextNode = { id, label, ...nextPosition };
+
+    setNodes((current) => [...current, nextNode]);
+    setNodePositions((current) => ({ ...current, [id]: nextPosition }));
+    setLinks((current) => (nodes.length ? [...current, [nodes[nodes.length - 1].id, id]] : current));
+    setSelectedNodes([id]);
+    setNewSystemName("");
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    addSystem();
+  };
+
+  const removeLink = (a, b) => {
+    const key = normalizeLink(a, b);
+    setLinks((current) => current.filter(([from, to]) => normalizeLink(from, to) !== key));
+  };
+
+  const labelFor = (id) => nodes.find((node) => node.id === id)?.label || id;
+
+  const linkSegments = links
+    .filter(([from, to]) => nodePositions[from] && nodePositions[to])
+    .map(([from, to]) => {
+      const a = ratioToPixels(nodePositions[from]);
+      const b = ratioToPixels(nodePositions[to]);
+      return { x1: a.x, y1: a.y, x2: b.x, y2: b.y, from, to };
+    });
 
   return (
-    <div className="relative z-10 mt-6 h-[500px] overflow-visible rounded-[2rem] border border-white/10 bg-black/20">
-      <svg className="absolute inset-0 h-full w-full overflow-visible opacity-80">
-        {links.map((linkItem, index) => (
-          <motion.line
-            key={index}
-            x1={linkItem.x1}
-            y1={linkItem.y1}
-            x2={linkItem.x2}
-            y2={linkItem.y2}
-            stroke={index % 2 === 0 ? "rgba(125,211,252,0.36)" : "rgba(255,255,255,0.20)"}
-            strokeWidth="2"
-            strokeDasharray="10 12"
-            animate={{ strokeDashoffset: [0, -44] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
-          />
-        ))}
-      </svg>
+    <div className="relative z-10 grid h-full min-h-0 gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+      <style>{`
+        .systems-scroll { scrollbar-width: thin; scrollbar-color: rgba(125, 211, 252, 0.55) rgba(255, 255, 255, 0.06); }
+        .systems-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .systems-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 999px; }
+        .systems-scroll::-webkit-scrollbar-thumb { background: rgba(125, 211, 252, 0.45); border-radius: 999px; border: 2px solid rgba(5, 7, 12, 0.55); }
+        .systems-scroll::-webkit-scrollbar-thumb:hover { background: rgba(125, 211, 252, 0.70); }
+      `}</style>
+      <div className="systems-scroll min-h-0 overflow-auto rounded-[2rem] border border-white/10 bg-black/20 p-5">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">systems</p>
+        <h4 className="mt-3 text-2xl font-black">Build the architecture map</h4>
+        <p className="mt-3 leading-7 text-slate-400">
+          Add named systems, drag them like constellation points, and click two nodes to connect or disconnect them.
+        </p>
 
-      {initialNodes.map((node) => (
-        <SystemsNode key={node.id} node={node} resetSignal={resetSignal} onMove={updateNode}>
-          {node.label}
-        </SystemsNode>
-      ))}
+        <form onSubmit={handleSubmit} className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <label className="text-xs font-black uppercase tracking-[0.22em] text-slate-400" htmlFor="system-name">New system name</label>
+          <div className="mt-3 flex gap-2">
+            <input
+              id="system-name"
+              value={newSystemName}
+              onChange={(event) => setNewSystemName(event.target.value)}
+              placeholder="Auth, Cache, DB..."
+              className="min-w-0 flex-1 rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
+            />
+            <button
+              type="submit"
+              className="rounded-full border border-sky-300/30 bg-sky-300/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-100 transition hover:bg-sky-300/25"
+            >
+              Add
+            </button>
+          </div>
+        </form>
 
-      <div className="absolute bottom-5 left-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300 backdrop-blur">
-        <p className="font-black text-white">System mode</p>
-        <p className="mt-1 max-w-60">Drag nodes anywhere. The connection lines follow the correct circles.</p>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Connections</p>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            Click one node, then another. Existing links disconnect; new pairs connect.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {selectedNodes.map((id) => (
+              <span key={id} className="rounded-full border border-sky-300/30 bg-sky-300/15 px-3 py-1 text-xs font-black text-sky-100">
+                {labelFor(id)} selected
+              </span>
+            ))}
+            {selectedNodes.length > 0 && (
+              <button type="button" onClick={() => setSelectedNodes([])} className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-bold text-slate-300 hover:bg-white/10">
+                Clear selection
+              </button>
+            )}
+          </div>
+          <div className="systems-scroll mt-4 max-h-32 space-y-2 overflow-auto pr-1">
+            {links.length === 0 && <p className="text-xs text-slate-500">No active links yet.</p>}
+            {links.map(([from, to]) => (
+              <button
+                key={normalizeLink(from, to)}
+                type="button"
+                onClick={() => removeLink(from, to)}
+                className="mr-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-slate-300 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
+                title="Click to remove this connection"
+              >
+                {labelFor(from)} ↔ {labelFor(to)} ×
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 font-mono text-sm text-slate-300">
+          <span className="text-sky-300">systems</span>.count({nodes.length}); <span className="text-sky-300">links</span>.count({links.length});
+        </div>
+      </div>
+
+      <div ref={boardRef} data-systems-board className="relative h-full min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 [touch-action:none]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(125,211,252,0.10),transparent_20%),radial-gradient(circle_at_72%_70%,rgba(255,255,255,0.07),transparent_25%)]" />
+        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden opacity-80">
+          {linkSegments.map((linkItem, index) => (
+            <motion.line
+              key={`${linkItem.from}-${linkItem.to}-${index}`}
+              x1={linkItem.x1}
+              y1={linkItem.y1}
+              x2={linkItem.x2}
+              y2={linkItem.y2}
+              stroke={index % 2 === 0 ? "rgba(125,211,252,0.36)" : "rgba(255,255,255,0.20)"}
+              strokeWidth="2"
+              strokeDasharray="10 12"
+              animate={{ strokeDashoffset: [0, -44] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
+            />
+          ))}
+        </svg>
+
+        {nodes.map((node) => {
+          const pixel = ratioToPixels(nodePositions[node.id] || { x: node.x, y: node.y });
+          return (
+            <SystemsNode
+              key={node.id}
+              node={node}
+              pixel={pixel}
+              onStartDrag={startNodeDrag}
+              selected={selectedNodes.includes(node.id)}
+            >
+              {node.label}
+            </SystemsNode>
+          );
+        })}
+
+        <div className="pointer-events-none absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300 backdrop-blur sm:right-auto">
+          <p className="font-black text-white">System mode</p>
+          <p className="mt-1 max-w-72">Drag nodes like stars. Click two nodes to toggle a connection.</p>
+        </div>
       </div>
     </div>
   );
 }
 
+const defaultPlayboxSize = { width: 1152, height: 700 };
+
 function Toybox() {
   const [resetSignal, setResetSignal] = useState(0);
   const [activeMode, setActiveMode] = useState("motion");
+  const [playboxSize, setPlayboxSize] = useState(defaultPlayboxSize);
+  const [sizeResetAnimating, setSizeResetAnimating] = useState(false);
+
+  const startResize = (event) => {
+    setSizeResetAnimating(false);
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startWidth = playboxSize.width;
+    const startHeight = playboxSize.height;
+
+    const move = (moveEvent) => {
+      setPlayboxSize({
+        width: Math.min(Math.max(startWidth + moveEvent.clientX - startX, 760), 1400),
+        height: Math.min(Math.max(startHeight + moveEvent.clientY - startY, 620), 1050),
+      });
+    };
+
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  };
+
+  const resetPlayboxSize = () => {
+    setSizeResetAnimating(true);
+    setPlayboxSize(defaultPlayboxSize);
+    window.setTimeout(() => setSizeResetAnimating(false), 560);
+  };
 
   const modeCopy = {
     motion: {
       title: "Motion playground",
       description: "Throw draggable objects around and let the motion system do the work.",
     },
-    mixer: {
-      title: "Visual mixer",
-      description: "Use sliders to remix the preview’s accent, density, and radius in real time.",
-    },
-    gravity: {
-      title: "Gravity field",
-      description: "Adjust gravity and play with falling objects that respond to the control panel.",
+    constellations: {
+      title: "Constellations",
+      description: "Click to drop star points, then drag them around to redesign the constellation.",
     },
     systems: {
       title: "Systems playground",
@@ -840,20 +1155,21 @@ function Toybox() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
-          className="relative mx-auto min-h-[700px] max-w-6xl overflow-visible rounded-[2.5rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/40 backdrop-blur-xl"
+          className={`relative mx-auto flex flex-col overflow-visible rounded-[2.5rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/40 backdrop-blur-xl ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
+          style={{ width: playboxSize.width, maxWidth: "calc(100vw - 48px)", height: playboxSize.height }}
         >
           <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(to_bottom,rgba(255,255,255,0.04),transparent)]" />
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.035)_1px,transparent_1px)] bg-[size:54px_54px] opacity-70" />
           </div>
 
-          <div className="relative z-10 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="relative z-10 flex shrink-0 flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
               <p className="font-mono text-xs uppercase tracking-[0.28em] text-sky-300">{activeMode}</p>
               <h3 className="mt-2 text-2xl font-black">{modeCopy[activeMode].title}</h3>
-              <p className="mt-2 max-w-2xl text-sm text-slate-400">{modeCopy[activeMode].description}</p>
+              <p className="mt-2 max-w-xl text-sm text-slate-400">{modeCopy[activeMode].description}</p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex shrink-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {Object.keys(modeCopy).map((modeName) => (
                 <button
                   key={modeName}
@@ -862,7 +1178,7 @@ function Toybox() {
                     setActiveMode(modeName);
                     setResetSignal((value) => value + 1);
                   }}
-                  className={`rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold uppercase tracking-[0.16em] transition ${
                     activeMode === modeName
                       ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
                       : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
@@ -874,7 +1190,7 @@ function Toybox() {
               <button
                 type="button"
                 onClick={() => setResetSignal((value) => value + 1)}
-                className="rounded-full border border-white/20 bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#05070c] transition hover:bg-sky-200"
+                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white px-3.5 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#05070c] transition hover:bg-sky-200"
               >
                 Reset
               </button>
@@ -884,17 +1200,38 @@ function Toybox() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeMode}
+              className="relative z-10 mt-6 min-h-0 flex-1"
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -18, scale: 0.98 }}
               transition={{ duration: 0.35 }}
             >
               {activeMode === "motion" && <MotionPlayground resetSignal={resetSignal} />}
-              {activeMode === "mixer" && <ColorMixerPlayground resetSignal={resetSignal} />}
-              {activeMode === "gravity" && <GravityPlayground resetSignal={resetSignal} />}
+              {activeMode === "constellations" && <ConstellationsPlayground resetSignal={resetSignal} />}
               {activeMode === "systems" && <SystemsPlayground resetSignal={resetSignal} />}
             </motion.div>
           </AnimatePresence>
+
+          <div className="pointer-events-none absolute bottom-4 left-6 z-20 rounded-full border border-white/10 bg-[#070b12]/60 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 backdrop-blur-md">
+            Tip: drag the corner to resize · double-click it to reset
+          </div>
+
+          <button
+            type="button"
+            aria-label="Resize toybox. Double click to reset to the original size."
+            title="Drag to resize. Double click to reset."
+            onDoubleClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              resetPlayboxSize();
+            }}
+            onPointerDown={startResize}
+            className="absolute bottom-3 right-3 z-30 h-10 w-10 cursor-nwse-resize rounded-br-[1.4rem] opacity-70 transition hover:opacity-100"
+          >
+            <span className="absolute bottom-2 right-2 h-4 w-4 rounded-br-xl border-b-2 border-r-2 border-sky-200/70" />
+            <span className="absolute bottom-2 right-2 h-6 w-6 rounded-br-2xl border-b-2 border-r-2 border-sky-200/40" />
+            <span className="absolute bottom-2 right-2 h-8 w-8 rounded-br-[1.25rem] border-b-2 border-r-2 border-sky-200/20" />
+          </button>
         </motion.div>
       </div>
     </section>
