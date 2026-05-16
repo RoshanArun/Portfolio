@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useSpring, useTransform, AnimatePresence, useAnimation } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform, AnimatePresence, useAnimation, useReducedMotion } from "framer-motion";
 import { ArrowRight, Mail, ExternalLink, Code2, Smartphone, Sparkles, Layers, Rocket, Menu, X } from "lucide-react";
 
 const projects = [
@@ -85,9 +85,13 @@ const experience = [
 ];
 
 function LivingBackground() {
+  const isSmallScreen = useIsSmallScreen();
+  const prefersReducedMotion = useReducedMotion();
+  const particleCount = isSmallScreen ? 44 : 90;
+
   const particles = useMemo(
     () =>
-      Array.from({ length: 90 }, (_, i) => ({
+      Array.from({ length: particleCount }, (_, i) => ({
         id: i,
         left: `${(i * 29 + 11) % 100}%`,
         top: `${(i * 47 + 17) % 100}%`,
@@ -95,13 +99,13 @@ function LivingBackground() {
         delay: (i % 13) * 0.22,
         duration: 4 + (i % 9),
       })),
-    []
+    [particleCount]
   );
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#05070c]">
       <motion.div
-        animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+        animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
         className="absolute -inset-[20%] opacity-55 blur-3xl"
         style={{
@@ -118,7 +122,7 @@ function LivingBackground() {
           key={particle.id}
           className="absolute rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.75)]"
           style={{ left: particle.left, top: particle.top, width: particle.size, height: particle.size }}
-          animate={{ y: [0, -24, 0], opacity: [0.12, 0.75, 0.12], scale: [1, 1.7, 1] }}
+          animate={prefersReducedMotion ? { opacity: 0.28 } : { y: [0, -24, 0], opacity: [0.12, 0.75, 0.12], scale: [1, 1.7, 1] }}
           transition={{ duration: particle.duration + 2, delay: particle.delay, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
@@ -339,21 +343,21 @@ function Hero() {
       <NetworkMap />
       <FloatingPanels />
 
-      <motion.div style={{ y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-6 pt-28 pb-20 lg:grid-cols-[1.02fr_0.98fr]">
-        <div>
-          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }} className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-sky-100 backdrop-blur">
+      <motion.div style={{ y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-6 pt-28 pb-20 text-center sm:text-left lg:grid-cols-[1.02fr_0.98fr]">
+        <div className="mx-auto max-w-3xl sm:mx-0 sm:max-w-none">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }} className="mx-auto mb-6 inline-flex w-fit items-center gap-2 rounded-full sm:mx-0 border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-sky-100 backdrop-blur">
             <Sparkles className="h-4 w-4" /> Software Engineer / iOS / Frontend
           </motion.div>
 
-          <motion.h1 initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.1 }} className="max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl xl:text-8xl">
+          <motion.h1 initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.1 }} className="mx-auto max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.05em] text-white sm:mx-0 sm:text-6xl lg:text-7xl xl:text-8xl">
             I build digital products that feel sharp, fast, and alive.
           </motion.h1>
 
-          <motion.p initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.24 }} className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
+          <motion.p initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.24 }} className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-slate-300 sm:mx-0 sm:text-xl">
             I’m Roshan, a software developer focused on iOS, frontend systems, clean architecture, and premium motion-driven user experiences.
           </motion.p>
 
-          <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.36 }} className="mt-10 flex flex-wrap gap-4">
+          <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.36 }} className="mt-10 flex flex-wrap justify-center gap-4 sm:justify-start">
             <MagneticButton href="#work">View Work</MagneticButton>
             <MagneticButton href="mailto:Roshan.arun@live.com" variant="secondary">Start a Project</MagneticButton>
           </motion.div>
@@ -507,7 +511,7 @@ function DraggableToy({ resetSignal, initial, className = "", children, dragMome
       animate={controls}
       whileDrag={{ scale: 1.08, zIndex: 120, rotate: 2 }}
       whileHover={whileHover}
-      className={`absolute cursor-grab select-none active:cursor-grabbing [touch-action:none] ${className}`}
+      className={`absolute cursor-grab select-none will-change-transform active:cursor-grabbing [touch-action:none] ${className}`}
       style={{ left: initial.left, top: initial.top, ...motionStyle }}
     >
       {children}
@@ -515,12 +519,12 @@ function DraggableToy({ resetSignal, initial, className = "", children, dragMome
   );
 }
 
-function MotionToyFace({ toy }) {
+const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
   if (toy.kind === "magnet") {
     return (
       <div className="relative h-full w-full overflow-hidden rounded-[1.5rem] p-3">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">Magnet</div>
-        <div className="relative mt-3 h-11">
+        <div className="relative mt-3 h-12">
           <motion.span
             animate={{ x: [0, 34, 0], scale: [1, 1.18, 1] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
@@ -557,10 +561,10 @@ function MotionToyFace({ toy }) {
 
   if (toy.kind === "ease") {
     return (
-      <div className="w-40">
+      <div className="w-28 sm:w-40">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-sky-200/70"><span>Ease</span><span>curve</span></div>
         <div className="mt-3 h-1 rounded-full bg-white/10">
-          <motion.div animate={{ x: [0, 112, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }} className="h-2.5 w-2.5 -translate-y-1 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.9)]" />
+          <motion.div animate={{ x: [0, 78, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }} className="h-2.5 w-2.5 -translate-y-1 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.9)]" />
         </div>
       </div>
     );
@@ -568,15 +572,15 @@ function MotionToyFace({ toy }) {
 
   if (toy.kind === "signal") {
     return (
-      <div className="min-w-28">
+      <div className="min-w-20 sm:min-w-28">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">Signal</div>
-        <div className="mt-3 flex h-10 items-end gap-1.5">
+        <div className="mt-2 flex h-8 items-end gap-1 sm:mt-3 sm:h-10 sm:gap-1.5">
           {[22, 44, 30, 56, 38, 48].map((height, index) => (
             <motion.span
               key={index}
               animate={{ height: [height, 10 + ((height + index * 11) % 52), height] }}
               transition={{ duration: 1.2 + index * 0.08, repeat: Infinity, ease: "easeInOut", delay: index * 0.04 }}
-              className="w-3 rounded-full bg-sky-300/30 ring-1 ring-sky-200/25"
+              className="w-2 rounded-full bg-sky-300/30 ring-1 ring-sky-200/25 sm:w-3"
               style={{ height }}
             />
           ))}
@@ -592,43 +596,53 @@ function MotionToyFace({ toy }) {
           key={ring}
           animate={{ scale: [0.15, 1.2], opacity: [0.75, 0] }}
           transition={{ duration: 2.1, repeat: Infinity, ease: "easeOut", delay: ring * 0.45 }}
-          className="absolute h-16 w-16 rounded-full border border-sky-200/45"
+          className="absolute h-12 w-12 rounded-full border border-sky-200/45 sm:h-16 sm:w-16"
         />
       ))}
       <span className="relative z-10 text-xs font-black">Ripple</span>
     </div>
   );
-}
+});
 
 function MotionPlayground({ resetSignal }) {
-  const toys = [
-    { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
-    { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
-    { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
-    { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
-    { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
-  ];
+  const isSmallScreen = useIsSmallScreen();
+  const prefersReducedMotion = useReducedMotion();
+  const toys = isSmallScreen
+    ? [
+        { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
+        { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
+        { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
+        { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
+        { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
+      ]
+    : [
+        { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
+        { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
+        { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
+        { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
+        { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
+      ];
 
   const toyClass = (shape) => {
     if (shape === "orb") {
-      return "grid h-[7.65rem] w-[7.65rem] place-items-center rounded-full border border-sky-300/20 bg-sky-300/10 text-[11px] font-black uppercase tracking-[0.14em] text-sky-100 shadow-2xl shadow-sky-950/30 backdrop-blur";
+      return "grid h-[5.6rem] w-[5.6rem] place-items-center rounded-full border border-sky-300/20 bg-sky-300/10 text-[10px] font-black uppercase tracking-[0.14em] text-sky-100 shadow-2xl shadow-sky-950/30 backdrop-blur sm:h-[7.65rem] sm:w-[7.65rem] sm:text-[11px]";
     }
     if (shape === "panel") {
-      return "h-[5.1rem] w-[8.5rem] rounded-[1.5rem] border border-sky-300/20 bg-[#0b1220]/90 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+      return "min-h-[5.25rem] w-[6.35rem] rounded-[1.25rem] border border-sky-300/20 bg-[#0b1220]/90 text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:min-h-[5.25rem] sm:w-[8.5rem] sm:rounded-[1.5rem] sm:text-xs";
     }
     if (shape === "wide") {
-      return "rounded-2xl border border-sky-300/20 bg-[#0b1220]/90 px-5 py-4 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+      return "rounded-2xl border border-sky-300/20 bg-[#0b1220]/90 px-3 py-3 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:px-5 sm:py-4 sm:text-sm";
     }
     if (shape === "bars") {
-      return "rounded-[1.7rem] border border-sky-300/20 bg-[#0b1220]/90 px-3.5 py-3 text-[11px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+      return "rounded-[1.35rem] border border-sky-300/20 bg-[#0b1220]/90 px-2.5 py-2 text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:rounded-[1.7rem] sm:px-3.5 sm:py-3 sm:text-[11px]";
     }
-    return "grid h-[5.75rem] w-[5.75rem] place-items-center rounded-full border border-sky-300/20 bg-[#0b1220]/90 text-sm font-black text-white shadow-2xl shadow-black/40 backdrop-blur";
+    return "grid h-[4.7rem] w-[4.7rem] place-items-center rounded-full border border-sky-300/20 bg-[#0b1220]/90 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:h-[5.75rem] sm:w-[5.75rem] sm:text-sm";
   };
 
   return (
-    <div className="relative z-10 h-full min-h-[430px] overflow-visible rounded-[2rem] border border-white/10 bg-black/20">
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-[43%] top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-sky-300/15" />
-      <motion.div animate={{ rotate: -360 }} transition={{ duration: 54, repeat: Infinity, ease: "linear" }} className="absolute left-[43%] top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
+    <div className="relative z-10 h-[510px] overflow-visible rounded-[1.5rem] border border-white/10 bg-black/20 sm:h-full sm:min-h-[430px] sm:rounded-[2rem]">
+      <motion.div animate={prefersReducedMotion ? undefined : { rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-[45%] top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-sky-300/15 sm:left-[43%] sm:h-64 sm:w-64" />
+      <motion.div animate={prefersReducedMotion ? undefined : { rotate: -360 }} transition={{ duration: 54, repeat: Infinity, ease: "linear" }} className="absolute left-[45%] top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:left-[43%] sm:h-44 sm:w-44" />
 
       {toys.map((toy) => (
         <DraggableToy key={toy.label} resetSignal={resetSignal} initial={{ left: toy.left, top: toy.top }} className={toyClass(toy.shape)}>
@@ -638,8 +652,8 @@ function MotionPlayground({ resetSignal }) {
 
       <DraggableToy
         resetSignal={resetSignal}
-        initial={{ left: "21%", top: "40%" }}
-        className="w-[44%] max-w-md rounded-2xl border border-white/10 bg-[#080c14]/85 p-5 font-mono text-sm text-slate-300 shadow-2xl shadow-black/30 backdrop-blur"
+        initial={{ left: isSmallScreen ? "15%" : "21%", top: isSmallScreen ? "45%" : "40%" }}
+        className="w-[68%] max-w-xs rounded-2xl border border-white/10 bg-[#080c14]/85 p-3 font-mono text-[10px] leading-5 text-slate-300 shadow-2xl shadow-black/30 backdrop-blur sm:w-[44%] sm:max-w-md sm:p-5 sm:text-sm"
       >
         <p><span className="text-sky-300">motion</span>.play(&#123; magnet, orbit, ease, signal, ripple &#125;);</p>
       </DraggableToy>
@@ -661,9 +675,13 @@ function ConstellationsPlayground({ resetSignal }) {
   );
   const [points, setPoints] = useState(defaultPoints);
   const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+  const [resetAnimating, setResetAnimating] = useState(false);
 
   useEffect(() => {
+    setResetAnimating(true);
     setPoints(defaultPoints);
+    const timer = window.setTimeout(() => setResetAnimating(false), 650);
+    return () => window.clearTimeout(timer);
   }, [resetSignal, defaultPoints]);
 
   useEffect(() => {
@@ -725,29 +743,33 @@ function ConstellationsPlayground({ resetSignal }) {
     window.addEventListener("pointerup", stop);
   };
 
-  const sortedPoints = [...points].sort((a, b) => a.id - b.id);
+  const sortedPoints = useMemo(() => [...points].sort((a, b) => a.id - b.id), [points]);
 
   return (
-    <div className="relative z-10 grid h-full min-h-0 gap-6 lg:grid-cols-[0.76fr_1.24fr]">
-      <div className="systems-scroll min-h-0 overflow-auto rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">constellations</p>
-        <h4 className="mt-3 text-2xl font-black">Draw your own star map</h4>
-        <p className="mt-3 leading-7 text-slate-400">
-          Click the sky to drop a point. Drag any star to redesign the constellation. The map scales with the playbox size.
+    <div className="systems-scroll relative z-10 grid min-h-0 gap-4 overflow-visible lg:h-full lg:grid-cols-[0.76fr_1.24fr] lg:gap-6">
+      <style>{`
+        .line-dash-flow { animation: lineDashFlow 2.6s linear infinite; }
+        @keyframes lineDashFlow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -36; } }
+      `}</style>
+      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-sky-300 sm:text-xs sm:tracking-[0.25em]">constellations</p>
+        <h4 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">Draw your own star map</h4>
+        <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base sm:leading-7">
+          Click the sky to drop a point. Drag any star to redesign the constellation.
         </p>
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-4 font-mono text-sm text-slate-300">
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-3 font-mono text-xs text-slate-300 sm:mt-8 sm:p-4 sm:text-sm">
           <span className="text-sky-300">stars</span>.connect({points.length});
         </div>
         <button
           type="button"
           onClick={() => setPoints([])}
-          className="mt-4 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-200 transition hover:bg-white/10"
+          className="mt-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-200 transition hover:bg-white/10 sm:mt-4 sm:text-xs sm:tracking-[0.18em]"
         >
           Clear stars
         </button>
       </div>
 
-      <div ref={boardRef} onClick={handleBoardClick} className="relative h-full min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 p-5 [touch-action:none]">
+      <div ref={boardRef} onClick={handleBoardClick} className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 p-3 [touch-action:none] sm:h-[420px] sm:rounded-[2rem] sm:p-5 lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(125,211,252,0.13),transparent_18%),radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.08),transparent_24%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible opacity-90">
           {sortedPoints.slice(1).map((point, index) => {
@@ -757,15 +779,13 @@ function ConstellationsPlayground({ resetSignal }) {
             return (
               <motion.line
                 key={`${previous.id}-${point.id}`}
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
+                initial={false}
+                animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y }}
+                transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
                 stroke="rgba(125,211,252,0.42)"
                 strokeWidth="2"
                 strokeDasharray="8 10"
-                animate={{ strokeDashoffset: [0, -36] }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: "linear" }}
+                className="line-dash-flow"
               />
             );
           })}
@@ -774,16 +794,18 @@ function ConstellationsPlayground({ resetSignal }) {
         {points.map((point, index) => {
           const pixel = ratioToPixels(point);
           return (
-            <button
+            <motion.button
               key={point.id}
               type="button"
               data-constellation-point
               onPointerDown={(event) => startDrag(event, point)}
+              initial={false}
+              animate={{ left: pixel.x, top: pixel.y }}
+              transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
               className="absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border border-sky-200/40 bg-sky-300/15 text-[10px] font-black text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.45)] backdrop-blur active:cursor-grabbing"
-              style={{ left: pixel.x, top: pixel.y }}
             >
               {index + 1}
-            </button>
+            </motion.button>
           );
         })}
 
@@ -793,22 +815,24 @@ function ConstellationsPlayground({ resetSignal }) {
   );
 }
 
-function SystemsNode({ node, pixel, onStartDrag, selected, children }) {
+const SystemsNode = React.memo(function SystemsNode({ node, pixel, onStartDrag, selected, resetAnimating, children }) {
   return (
     <motion.button
       type="button"
       onPointerDown={(event) => onStartDrag(event, node)}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 1.04 }}
-      className={`absolute z-10 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-3 text-center text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] ${
+      initial={false}
+      animate={{ left: pixel.x, top: pixel.y }}
+      transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
         selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
       }`}
-      style={{ left: pixel.x, top: pixel.y }}
     >
       <span className="line-clamp-2 leading-tight">{children}</span>
     </motion.button>
   );
-}
+});
 
 function SystemsPlayground({ resetSignal }) {
   const boardRef = useRef(null);
@@ -841,14 +865,18 @@ function SystemsPlayground({ resetSignal }) {
   const [newSystemName, setNewSystemName] = useState("");
   const [selectedNodes, setSelectedNodes] = useState([]);
   const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+  const [resetAnimating, setResetAnimating] = useState(false);
   const dragState = useRef({ moved: false, id: null, startX: 0, startY: 0, rect: null });
 
   useEffect(() => {
+    setResetAnimating(true);
     setNodes(defaultNodes);
     setNodePositions(makePositions(defaultNodes));
     setLinks(defaultLinks);
     setNewSystemName("");
     setSelectedNodes([]);
+    const timer = window.setTimeout(() => setResetAnimating(false), 650);
+    return () => window.clearTimeout(timer);
   }, [resetSignal, defaultNodes, defaultLinks]);
 
   useEffect(() => {
@@ -888,15 +916,15 @@ function SystemsPlayground({ resetSignal }) {
     setNodePositions((current) => ({ ...current, [id]: next }));
   };
 
-  const normalizeLink = (a, b) => [a, b].sort().join("::");
+  const linkKey = (a, b) => `${a}::${b}`;
 
-  const toggleLink = (a, b) => {
-    if (!a || !b || a === b) return;
-    const key = normalizeLink(a, b);
+  const toggleLink = (fromNode, toNode) => {
+    if (!fromNode || !toNode || fromNode === toNode) return;
+    const key = linkKey(fromNode, toNode);
     setLinks((current) => {
-      const exists = current.some(([from, to]) => normalizeLink(from, to) === key);
-      if (exists) return current.filter(([from, to]) => normalizeLink(from, to) !== key);
-      return [...current, [a, b]];
+      const exists = current.some(([from, to]) => linkKey(from, to) === key);
+      if (exists) return current.filter(([from, to]) => linkKey(from, to) !== key);
+      return [...current, [fromNode, toNode]];
     });
   };
 
@@ -955,47 +983,97 @@ function SystemsPlayground({ resetSignal }) {
     addSystem();
   };
 
-  const removeLink = (a, b) => {
-    const key = normalizeLink(a, b);
-    setLinks((current) => current.filter(([from, to]) => normalizeLink(from, to) !== key));
+  const removeLink = (fromNode, toNode) => {
+    const key = linkKey(fromNode, toNode);
+    setLinks((current) => current.filter(([from, to]) => linkKey(from, to) !== key));
   };
 
   const labelFor = (id) => nodes.find((node) => node.id === id)?.label || id;
 
-  const linkSegments = links
-    .filter(([from, to]) => nodePositions[from] && nodePositions[to])
-    .map(([from, to]) => {
-      const a = ratioToPixels(nodePositions[from]);
-      const b = ratioToPixels(nodePositions[to]);
-      return { x1: a.x, y1: a.y, x2: b.x, y2: b.y, from, to };
-    });
+  const linkSegments = useMemo(() =>
+    links
+      .filter(([from, to]) => nodePositions[from] && nodePositions[to])
+      .map(([from, to], index) => {
+        const a = ratioToPixels(nodePositions[from]);
+        const b = ratioToPixels(nodePositions[to]);
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const distance = Math.hypot(dx, dy) || 1;
+        const ux = dx / distance;
+        const uy = dy / distance;
+        const nodeRadius = boardSize.width < 520 ? 34 : 42;
+        const hasReverse = links.some(([otherFrom, otherTo]) => otherFrom === to && otherTo === from);
+        const offsetDirection = hasReverse && from > to ? -1 : 1;
+        const offset = hasReverse ? 7 * offsetDirection : 0;
+        const ox = -uy * offset;
+        const oy = ux * offset;
+        return {
+          x1: a.x + ux * nodeRadius + ox,
+          y1: a.y + uy * nodeRadius + oy,
+          x2: b.x - ux * nodeRadius + ox,
+          y2: b.y - uy * nodeRadius + oy,
+          from,
+          to,
+          stroke: index % 2 === 0 ? "rgba(125,211,252,0.34)" : "rgba(255,255,255,0.18)",
+          pulse: index % 2 === 0 ? "rgba(125,211,252,0.78)" : "rgba(255,255,255,0.55)",
+        };
+      }),
+    [links, nodePositions, boardSize.width, boardSize.height]
+  );
 
   return (
-    <div className="relative z-10 grid h-full min-h-0 gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+    <div className="systems-scroll relative z-10 grid min-h-0 gap-4 overflow-visible lg:h-full lg:grid-cols-[0.82fr_1.18fr] lg:gap-6">
       <style>{`
         .systems-scroll { scrollbar-width: thin; scrollbar-color: rgba(125, 211, 252, 0.55) rgba(255, 255, 255, 0.06); }
         .systems-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
         .systems-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 999px; }
         .systems-scroll::-webkit-scrollbar-thumb { background: rgba(125, 211, 252, 0.45); border-radius: 999px; border: 2px solid rgba(5, 7, 12, 0.55); }
         .systems-scroll::-webkit-scrollbar-thumb:hover { background: rgba(125, 211, 252, 0.70); }
+        .systems-link-dash { animation: systemsLineDashFlow 2.8s linear infinite; }
+        .system-name-input:-webkit-autofill,
+        .system-name-input:-webkit-autofill:hover,
+        .system-name-input:-webkit-autofill:focus,
+        .system-name-input:-webkit-autofill:active {
+          -webkit-text-fill-color: rgb(255, 255, 255) !important;
+          caret-color: rgb(255, 255, 255) !important;
+          box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.25) inset !important;
+          border-color: rgba(255, 255, 255, 0.10) !important;
+          transition: background-color 9999s ease-in-out 0s;
+        }
+        .system-name-input { color-scheme: dark; }
+        @keyframes systemsLineDashFlow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -44; } }
       `}</style>
-      <div className="systems-scroll min-h-0 overflow-auto rounded-[2rem] border border-white/10 bg-black/20 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-sky-300">systems</p>
-        <h4 className="mt-3 text-2xl font-black">Build the architecture map</h4>
-        <p className="mt-3 leading-7 text-slate-400">
-          Add named systems, drag them like constellation points, and click two nodes to connect or disconnect them.
+      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-sky-300 sm:text-xs sm:tracking-[0.25em]">systems</p>
+        <h4 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">Build the architecture map</h4>
+        <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base sm:leading-7">
+          Add named systems, drag nodes, then click two nodes to create or remove directed flows between them.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+        <form onSubmit={handleSubmit} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:mt-7 sm:p-4">
           <label className="text-xs font-black uppercase tracking-[0.22em] text-slate-400" htmlFor="system-name">New system name</label>
-          <div className="mt-3 flex gap-2">
-            <input
-              id="system-name"
-              value={newSystemName}
-              onChange={(event) => setNewSystemName(event.target.value)}
-              placeholder="Auth, Cache, DB..."
-              className="min-w-0 flex-1 rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
-            />
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <div className="relative min-w-0 flex-1">
+              <input
+                id="system-name"
+                value={newSystemName}
+                onChange={(event) => setNewSystemName(event.target.value)}
+                placeholder="Auth, Cache, DB..."
+                autoComplete="off"
+                spellCheck="false"
+                className="system-name-input w-full rounded-full border border-white/10 bg-black/25 px-4 py-2 pr-10 text-sm text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
+              />
+              {newSystemName && (
+                <button
+                  type="button"
+                  aria-label="Clear system name"
+                  onClick={() => setNewSystemName("")}
+                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
+                >
+                  ×
+                </button>
+              )}
+            </div>
             <button
               type="submit"
               className="rounded-full border border-sky-300/30 bg-sky-300/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-100 transition hover:bg-sky-300/25"
@@ -1005,10 +1083,10 @@ function SystemsPlayground({ resetSignal }) {
           </div>
         </form>
 
-        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:mt-4 sm:p-4">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Connections</p>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            Click one node, then another. Existing links disconnect; new pairs connect.
+          <p className="mt-2 text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
+            Tap a source node, then a destination node to toggle that flow.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {selectedNodes.map((id) => (
@@ -1026,39 +1104,89 @@ function SystemsPlayground({ resetSignal }) {
             {links.length === 0 && <p className="text-xs text-slate-500">No active links yet.</p>}
             {links.map(([from, to]) => (
               <button
-                key={normalizeLink(from, to)}
+                key={linkKey(from, to)}
                 type="button"
                 onClick={() => removeLink(from, to)}
                 className="mr-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-slate-300 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
                 title="Click to remove this connection"
               >
-                {labelFor(from)} ↔ {labelFor(to)} ×
+                {labelFor(from)} → {labelFor(to)} ×
               </button>
             ))}
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 font-mono text-sm text-slate-300">
-          <span className="text-sky-300">systems</span>.count({nodes.length}); <span className="text-sky-300">links</span>.count({links.length});
+      </div>
+
+      <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-3 sm:hidden">
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <input
+              value={newSystemName}
+              onChange={(event) => setNewSystemName(event.target.value)}
+              placeholder="New system name"
+              autoComplete="off"
+              spellCheck="false"
+              className="system-name-input w-full rounded-full border border-white/10 bg-black/25 px-3 py-2 pr-9 text-xs text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
+            />
+            {newSystemName && (
+              <button
+                type="button"
+                aria-label="Clear system name"
+                onClick={() => setNewSystemName("")}
+                className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          <button type="submit" className="rounded-full border border-sky-300/30 bg-sky-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-sky-100">
+            Add
+          </button>
+        </form>
+        <p className="mt-2 text-center text-[11px] leading-5 text-slate-400">Tap source, then destination to toggle that flow. Tap a chip below to remove it.</p>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {links.map(([from, to]) => (
+            <button key={linkKey(from, to)} type="button" onClick={() => removeLink(from, to)} className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] text-slate-300">
+              {labelFor(from)} → {labelFor(to)} ×
+            </button>
+          ))}
         </div>
       </div>
 
-      <div ref={boardRef} data-systems-board className="relative h-full min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/20 [touch-action:none]">
+      <div ref={boardRef} data-systems-board className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 [touch-action:none] sm:h-[430px] sm:rounded-[2rem] lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(125,211,252,0.10),transparent_20%),radial-gradient(circle_at_72%_70%,rgba(255,255,255,0.07),transparent_25%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden opacity-80">
           {linkSegments.map((linkItem, index) => (
-            <motion.line
-              key={`${linkItem.from}-${linkItem.to}-${index}`}
-              x1={linkItem.x1}
-              y1={linkItem.y1}
-              x2={linkItem.x2}
-              y2={linkItem.y2}
-              stroke={index % 2 === 0 ? "rgba(125,211,252,0.36)" : "rgba(255,255,255,0.20)"}
-              strokeWidth="2"
-              strokeDasharray="10 12"
-              animate={{ strokeDashoffset: [0, -44] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
-            />
+            <g key={`${linkItem.from}-${linkItem.to}-${index}`}>
+              <motion.line
+                initial={false}
+                animate={{ x1: linkItem.x1, y1: linkItem.y1, x2: linkItem.x2, y2: linkItem.y2 }}
+                transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+                stroke={linkItem.stroke}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="10 12"
+                className="systems-link-dash"
+              />
+              <motion.circle
+                r="3.4"
+                fill={linkItem.pulse}
+                initial={false}
+                animate={{
+                  cx: [linkItem.x1, linkItem.x2],
+                  cy: [linkItem.y1, linkItem.y2],
+                  opacity: [0, 0.95, 0],
+                  scale: [0.75, 1.1, 0.75],
+                }}
+                transition={{
+                  cx: { duration: 2.1, repeat: Infinity, ease: "easeInOut", delay: index * 0.18 },
+                  cy: { duration: 2.1, repeat: Infinity, ease: "easeInOut", delay: index * 0.18 },
+                  opacity: { duration: 2.1, repeat: Infinity, ease: "easeInOut", delay: index * 0.18 },
+                  scale: { duration: 2.1, repeat: Infinity, ease: "easeInOut", delay: index * 0.18 },
+                }}
+              />
+            </g>
           ))}
         </svg>
 
@@ -1071,15 +1199,25 @@ function SystemsPlayground({ resetSignal }) {
               pixel={pixel}
               onStartDrag={startNodeDrag}
               selected={selectedNodes.includes(node.id)}
+              resetAnimating={resetAnimating}
             >
               {node.label}
             </SystemsNode>
           );
         })}
 
-        <div className="pointer-events-none absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300 backdrop-blur sm:right-auto">
-          <p className="font-black text-white">System mode</p>
-          <p className="mt-1 max-w-72">Drag nodes like stars. Click two nodes to toggle a connection.</p>
+      </div>
+
+      <div className="hidden gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center lg:col-span-2 lg:grid lg:grid-cols-[0.82fr_1.18fr] lg:gap-6">
+        <div className="flex justify-center">
+          <div className="rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 font-mono text-xs text-slate-300 backdrop-blur">
+            <span className="text-sky-300">systems</span>.count({nodes.length}); <span className="text-sky-300">links</span>.count({links.length});
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <div className="rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-center text-xs font-semibold text-slate-300 backdrop-blur">
+            <span className="text-white">System mode:</span> drag nodes like stars · click source then destination to toggle a flow
+          </div>
         </div>
       </div>
     </div>
@@ -1088,13 +1226,30 @@ function SystemsPlayground({ resetSignal }) {
 
 const defaultPlayboxSize = { width: 1152, height: 700 };
 
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(() => (typeof window !== "undefined" ? window.innerWidth < 640 : false));
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsSmall(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+
+  return isSmall;
+}
+
 function Toybox() {
   const [resetSignal, setResetSignal] = useState(0);
   const [activeMode, setActiveMode] = useState("motion");
   const [playboxSize, setPlayboxSize] = useState(defaultPlayboxSize);
   const [sizeResetAnimating, setSizeResetAnimating] = useState(false);
+  const isSmallScreen = useIsSmallScreen();
 
   const startResize = (event) => {
+    if (isSmallScreen) return;
     setSizeResetAnimating(false);
     event.preventDefault();
     event.stopPropagation();
@@ -1140,8 +1295,10 @@ function Toybox() {
     },
   };
 
+  const modeNames = useMemo(() => Object.keys(modeCopy), []);
+
   return (
-    <section id="toybox" className="relative overflow-hidden px-6 py-32 text-white">
+    <section id="toybox" className="relative overflow-hidden px-4 py-24 text-white sm:px-6 sm:py-32">
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader
@@ -1155,22 +1312,34 @@ function Toybox() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
-          className={`relative mx-auto flex flex-col overflow-visible rounded-[2.5rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/40 backdrop-blur-xl ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
-          style={{ width: playboxSize.width, maxWidth: "calc(100vw - 48px)", height: playboxSize.height }}
+          className={`relative mx-auto flex flex-col overflow-visible rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/40 backdrop-blur-xl sm:rounded-[2.5rem] sm:p-6 ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
+          style={{
+            width: isSmallScreen ? "100%" : playboxSize.width,
+            maxWidth: isSmallScreen ? "calc(100vw - 32px)" : "calc(100vw - 48px)",
+            height: isSmallScreen ? "auto" : playboxSize.height,
+            minHeight: isSmallScreen ? 0 : undefined,
+          }}
         >
-          <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
+          <style>{`
+            .systems-scroll { scrollbar-width: thin; scrollbar-color: rgba(125, 211, 252, 0.55) rgba(255, 255, 255, 0.06); }
+            .systems-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+            .systems-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 999px; }
+            .systems-scroll::-webkit-scrollbar-thumb { background: rgba(125, 211, 252, 0.45); border-radius: 999px; border: 2px solid rgba(5, 7, 12, 0.55); }
+            .systems-scroll::-webkit-scrollbar-thumb:hover { background: rgba(125, 211, 252, 0.70); }
+          `}</style>
+          <div className="absolute inset-0 overflow-hidden rounded-[1.75rem] sm:rounded-[2.5rem]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(to_bottom,rgba(255,255,255,0.04),transparent)]" />
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.035)_1px,transparent_1px)] bg-[size:54px_54px] opacity-70" />
           </div>
 
-          <div className="relative z-10 flex shrink-0 flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative z-10 flex shrink-0 flex-col gap-3 border-b border-white/10 pb-4 lg:flex-row lg:items-center lg:justify-between lg:pb-5">
             <div className="min-w-0">
               <p className="font-mono text-xs uppercase tracking-[0.28em] text-sky-300">{activeMode}</p>
-              <h3 className="mt-2 text-2xl font-black">{modeCopy[activeMode].title}</h3>
-              <p className="mt-2 max-w-xl text-sm text-slate-400">{modeCopy[activeMode].description}</p>
+              <h3 className="mt-2 text-xl font-black sm:text-2xl">{modeCopy[activeMode].title}</h3>
+              <p className="mt-2 max-w-xl text-xs leading-5 text-slate-400 sm:text-sm">{modeCopy[activeMode].description}</p>
             </div>
             <div className="flex shrink-0 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {Object.keys(modeCopy).map((modeName) => (
+              {modeNames.map((modeName) => (
                 <button
                   key={modeName}
                   type="button"
@@ -1178,7 +1347,7 @@ function Toybox() {
                     setActiveMode(modeName);
                     setResetSignal((value) => value + 1);
                   }}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold uppercase tracking-[0.16em] transition ${
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
                     activeMode === modeName
                       ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
                       : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
@@ -1190,7 +1359,7 @@ function Toybox() {
               <button
                 type="button"
                 onClick={() => setResetSignal((value) => value + 1)}
-                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white px-3.5 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#05070c] transition hover:bg-sky-200"
+                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#05070c] transition hover:bg-sky-200 sm:px-3.5 sm:text-xs sm:tracking-[0.16em]"
               >
                 Reset
               </button>
@@ -1200,7 +1369,7 @@ function Toybox() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeMode}
-              className="relative z-10 mt-6 min-h-0 flex-1"
+              className="relative z-10 mt-4 min-h-0 sm:mt-6 lg:flex-1"
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -18, scale: 0.98 }}
@@ -1212,9 +1381,6 @@ function Toybox() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="pointer-events-none absolute bottom-4 left-6 z-20 rounded-full border border-white/10 bg-[#070b12]/60 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 backdrop-blur-md">
-            Tip: drag the corner to resize · double-click it to reset
-          </div>
 
           <button
             type="button"
@@ -1226,13 +1392,17 @@ function Toybox() {
               resetPlayboxSize();
             }}
             onPointerDown={startResize}
-            className="absolute bottom-3 right-3 z-30 h-10 w-10 cursor-nwse-resize rounded-br-[1.4rem] opacity-70 transition hover:opacity-100"
+            className="absolute bottom-3 right-3 z-30 hidden h-10 w-10 cursor-nwse-resize rounded-br-[1.4rem] opacity-70 transition hover:opacity-100 sm:block"
           >
             <span className="absolute bottom-2 right-2 h-4 w-4 rounded-br-xl border-b-2 border-r-2 border-sky-200/70" />
             <span className="absolute bottom-2 right-2 h-6 w-6 rounded-br-2xl border-b-2 border-r-2 border-sky-200/40" />
             <span className="absolute bottom-2 right-2 h-8 w-8 rounded-br-[1.25rem] border-b-2 border-r-2 border-sky-200/20" />
           </button>
         </motion.div>
+
+        <p className="mx-auto mt-4 w-fit max-w-[calc(100%-2rem)] rounded-full border border-white/10 bg-white/[0.055] px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 shadow-xl shadow-black/20 backdrop-blur sm:text-[11px]">
+          Desktop: drag corner to resize · double-click to reset. Mobile: touch-friendly layout.
+        </p>
       </div>
     </section>
   );
