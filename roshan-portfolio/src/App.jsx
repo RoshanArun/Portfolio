@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform, AnimatePresence, useAnimation, useReducedMotion } from "framer-motion";
 import { ArrowRight, Mail, ExternalLink, Code2, Smartphone, Sparkles, Layers, Rocket, Menu, X } from "lucide-react";
 
@@ -84,6 +84,10 @@ const experience = [
   },
 ];
 
+const sectionVisibilityClass = "[content-visibility:auto] [contain-intrinsic-size:900px]";
+const springResetTransition = { type: "spring", stiffness: 170, damping: 20 };
+const smoothResetDuration = 650;
+
 function LivingBackground() {
   const isSmallScreen = useIsSmallScreen();
   const prefersReducedMotion = useReducedMotion();
@@ -162,10 +166,11 @@ function NetworkMap() {
 }
 
 function HologramCore() {
+  const prefersReducedMotion = useReducedMotion();
   const rings = [
-    { size: "h-[520px] w-[520px]", speed: 28, border: "border-sky-300/20" },
-    { size: "h-[405px] w-[405px]", speed: 38, border: "border-white/14", reverse: true },
-    { size: "h-[280px] w-[280px]", speed: 20, border: "border-blue-400/20" },
+    { size: "h-[320px] w-[320px] sm:h-[420px] sm:w-[420px] lg:h-[520px] lg:w-[520px]", speed: 28, border: "border-sky-300/20" },
+    { size: "h-[255px] w-[255px] sm:h-[335px] sm:w-[335px] lg:h-[405px] lg:w-[405px]", speed: 38, border: "border-white/14", reverse: true },
+    { size: "h-[185px] w-[185px] sm:h-[235px] sm:w-[235px] lg:h-[280px] lg:w-[280px]", speed: 20, border: "border-blue-400/20" },
   ];
 
   return (
@@ -173,27 +178,27 @@ function HologramCore() {
       initial={{ opacity: 0, scale: 0.92, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.35, ease: "easeOut" }}
-      className="relative mx-auto mt-12 h-[420px] w-full max-w-xl lg:mt-0 lg:h-[620px]"
+      className="relative mx-auto mt-10 h-[360px] w-full max-w-xl sm:h-[460px] lg:mt-0 lg:h-[620px]"
     >
       <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-3xl" />
 
       {rings.map((ring, index) => (
         <motion.div
           key={ring.size}
-          animate={{ rotate: ring.reverse ? -360 : 360 }}
+          animate={prefersReducedMotion ? undefined : { rotate: ring.reverse ? -360 : 360 }}
           transition={{ duration: ring.speed, repeat: Infinity, ease: "linear" }}
           className={`absolute left-1/2 top-1/2 ${ring.size} -translate-x-1/2 -translate-y-1/2 rounded-full border ${ring.border}`}
         >
           <motion.span
             className="absolute -top-1 left-1/2 h-3 w-3 rounded-full bg-sky-300 shadow-[0_0_26px_rgba(125,211,252,1)]"
-            animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
+            animate={prefersReducedMotion ? { opacity: 0.75 } : { scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 2.4, delay: index * 0.3, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
       ))}
 
       <motion.div
-        animate={{ y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
+        animate={prefersReducedMotion ? undefined : { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         className="absolute left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/15 bg-[#070b12]/70 p-5 shadow-2xl shadow-sky-500/10 backdrop-blur-2xl"
       >
@@ -246,6 +251,7 @@ function HologramCore() {
 }
 
 function FloatingPanels() {
+  const prefersReducedMotion = useReducedMotion();
   const panels = [
     { text: "npm run build  ✓", top: "18%", left: "6%", rotate: -7, delay: 0 },
     { text: "animation engine online", top: "27%", left: "73%", rotate: 6, delay: 0.4 },
@@ -259,7 +265,7 @@ function FloatingPanels() {
         <motion.div
           key={panel.text}
           initial={{ opacity: 0, y: 30, rotate: panel.rotate }}
-          animate={{ opacity: 0.72, y: [0, -18, 0], rotate: [panel.rotate, panel.rotate + 2, panel.rotate] }}
+          animate={prefersReducedMotion ? { opacity: 0.72, y: 0, rotate: panel.rotate } : { opacity: 0.72, y: [0, -18, 0], rotate: [panel.rotate, panel.rotate + 2, panel.rotate] }}
           transition={{ opacity: { delay: panel.delay, duration: 1 }, y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay }, rotate: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay } }}
           className="absolute rounded-2xl border border-sky-300/15 bg-[#070b12]/55 px-5 py-3 font-mono text-xs text-sky-100 shadow-2xl shadow-black/30 backdrop-blur-xl"
           style={{ top: panel.top, left: panel.left }}
@@ -419,7 +425,7 @@ function ProjectCard({ project, index }) {
 
 function Work() {
   return (
-    <section id="work" className="relative overflow-hidden px-6 py-32 text-white">
+    <section id="work" className={`relative overflow-hidden px-6 py-32 text-white ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Selected Work" title="Projects built with clean structure and sharp execution." description="A mix of real experience and mock portfolio-ready projects designed to show frontend, mobile, animation, and product thinking." />
@@ -468,16 +474,17 @@ function SkillFlipCard({ item, index }) {
 }
 
 function Skills() {
+  const prefersReducedMotion = useReducedMotion();
   const repeated = useMemo(() => [...skills, ...skills, ...skills], []);
   return (
-    <section id="skills" className="relative overflow-hidden py-32 text-white">
+    <section id="skills" className={`relative overflow-hidden py-32 text-white ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Stack" title="The tools behind the build." description="Mobile, web, UI systems, API integration, and performance-focused development." />
         <div className="relative mx-auto max-w-7xl overflow-hidden">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#05070c] to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#05070c] to-transparent" />
-          <motion.div animate={{ x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6">
+          <motion.div animate={prefersReducedMotion ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
             {repeated.map((skill, index) => <div key={`${skill}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-4 text-lg font-black text-white shadow-xl shadow-black/20">{skill}</div>)}
           </motion.div>
         </div>
@@ -680,7 +687,7 @@ function ConstellationsPlayground({ resetSignal }) {
   useEffect(() => {
     setResetAnimating(true);
     setPoints(defaultPoints);
-    const timer = window.setTimeout(() => setResetAnimating(false), 650);
+    const timer = window.setTimeout(() => setResetAnimating(false), smoothResetDuration);
     return () => window.clearTimeout(timer);
   }, [resetSignal, defaultPoints]);
 
@@ -781,7 +788,7 @@ function ConstellationsPlayground({ resetSignal }) {
                 key={`${previous.id}-${point.id}`}
                 initial={false}
                 animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y }}
-                transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+                transition={resetAnimating ? springResetTransition : { duration: 0 }}
                 stroke="rgba(125,211,252,0.42)"
                 strokeWidth="2"
                 strokeDasharray="8 10"
@@ -801,7 +808,7 @@ function ConstellationsPlayground({ resetSignal }) {
               onPointerDown={(event) => startDrag(event, point)}
               initial={false}
               animate={{ left: pixel.x, top: pixel.y }}
-              transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+              transition={resetAnimating ? springResetTransition : { duration: 0 }}
               className="absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border border-sky-200/40 bg-sky-300/15 text-[10px] font-black text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.45)] backdrop-blur active:cursor-grabbing"
             >
               {index + 1}
@@ -824,7 +831,7 @@ const SystemsNode = React.memo(function SystemsNode({ node, pixel, onStartDrag, 
       whileTap={{ scale: 1.04 }}
       initial={false}
       animate={{ left: pixel.x, top: pixel.y }}
-      transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+      transition={resetAnimating ? springResetTransition : { duration: 0 }}
       className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
         selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
       }`}
@@ -875,7 +882,7 @@ function SystemsPlayground({ resetSignal }) {
     setLinks(defaultLinks);
     setNewSystemName("");
     setSelectedNodes([]);
-    const timer = window.setTimeout(() => setResetAnimating(false), 650);
+    const timer = window.setTimeout(() => setResetAnimating(false), smoothResetDuration);
     return () => window.clearTimeout(timer);
   }, [resetSignal, defaultNodes, defaultLinks]);
 
@@ -909,12 +916,12 @@ function SystemsPlayground({ resetSignal }) {
     y: position.y * boardSize.height,
   });
 
-  const updateNodeFromClient = (id, clientX, clientY, rectOverride) => {
+  const updateNodeFromClient = useCallback((id, clientX, clientY, rectOverride) => {
     const rect = rectOverride || boardRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next = clampRatioPoint((clientX - rect.left) / rect.width, (clientY - rect.top) / rect.height);
     setNodePositions((current) => ({ ...current, [id]: next }));
-  };
+  }, []);
 
   const linkKey = (a, b) => `${a}::${b}`;
 
@@ -988,7 +995,8 @@ function SystemsPlayground({ resetSignal }) {
     setLinks((current) => current.filter(([from, to]) => linkKey(from, to) !== key));
   };
 
-  const labelFor = (id) => nodes.find((node) => node.id === id)?.label || id;
+  const nodeLabelMap = useMemo(() => Object.fromEntries(nodes.map((node) => [node.id, node.label])), [nodes]);
+  const labelFor = useCallback((id) => nodeLabelMap[id] || id, [nodeLabelMap]);
 
   const linkSegments = useMemo(() =>
     links
@@ -1162,7 +1170,7 @@ function SystemsPlayground({ resetSignal }) {
               <motion.line
                 initial={false}
                 animate={{ x1: linkItem.x1, y1: linkItem.y1, x2: linkItem.x2, y2: linkItem.y2 }}
-                transition={resetAnimating ? { type: "spring", stiffness: 170, damping: 20 } : { duration: 0 }}
+                transition={resetAnimating ? springResetTransition : { duration: 0 }}
                 stroke={linkItem.stroke}
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -1248,7 +1256,9 @@ function Toybox() {
   const [sizeResetAnimating, setSizeResetAnimating] = useState(false);
   const isSmallScreen = useIsSmallScreen();
 
-  const startResize = (event) => {
+  const resizeRaf = useRef(null);
+
+  const startResize = useCallback((event) => {
     if (isSmallScreen) return;
     setSizeResetAnimating(false);
     event.preventDefault();
@@ -1257,30 +1267,42 @@ function Toybox() {
     const startY = event.clientY;
     const startWidth = playboxSize.width;
     const startHeight = playboxSize.height;
+    let latestEvent = event;
 
-    const move = (moveEvent) => {
+    const applyResize = () => {
+      resizeRaf.current = null;
       setPlayboxSize({
-        width: Math.min(Math.max(startWidth + moveEvent.clientX - startX, 760), 1400),
-        height: Math.min(Math.max(startHeight + moveEvent.clientY - startY, 620), 1050),
+        width: Math.min(Math.max(startWidth + latestEvent.clientX - startX, 760), 1400),
+        height: Math.min(Math.max(startHeight + latestEvent.clientY - startY, 620), 1050),
       });
     };
 
+    const move = (moveEvent) => {
+      latestEvent = moveEvent;
+      if (!resizeRaf.current) resizeRaf.current = window.requestAnimationFrame(applyResize);
+    };
+
     const stop = () => {
+      if (resizeRaf.current) {
+        window.cancelAnimationFrame(resizeRaf.current);
+        resizeRaf.current = null;
+        applyResize();
+      }
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
     };
 
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
-  };
+  }, [isSmallScreen, playboxSize.height, playboxSize.width]);
 
-  const resetPlayboxSize = () => {
+  const resetPlayboxSize = useCallback(() => {
     setSizeResetAnimating(true);
     setPlayboxSize(defaultPlayboxSize);
     window.setTimeout(() => setSizeResetAnimating(false), 560);
-  };
+  }, []);
 
-  const modeCopy = {
+  const modeCopy = useMemo(() => ({
     motion: {
       title: "Motion playground",
       description: "Throw draggable objects around and let the motion system do the work.",
@@ -1293,9 +1315,9 @@ function Toybox() {
       title: "Systems playground",
       description: "Drag architecture nodes anywhere and watch the connection lines follow.",
     },
-  };
+  }), []);
 
-  const modeNames = useMemo(() => Object.keys(modeCopy), []);
+  const modeNames = useMemo(() => Object.keys(modeCopy), [modeCopy]);
 
   return (
     <section id="toybox" className="relative overflow-hidden px-4 py-24 text-white sm:px-6 sm:py-32">
@@ -1369,7 +1391,7 @@ function Toybox() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeMode}
-              className="relative z-10 mt-4 min-h-0 sm:mt-6 lg:flex-1"
+              className="relative z-10 mt-4 min-h-0 sm:mt-6 lg:flex-1 [transform:translateZ(0)]"
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -18, scale: 0.98 }}
@@ -1410,7 +1432,7 @@ function Toybox() {
 
 function Experience() {
   return (
-    <section id="experience" className="relative overflow-hidden px-6 py-32 text-white">
+    <section id="experience" className={`relative overflow-hidden px-6 py-32 text-white ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Experience" title="Real-world software development experience." description="Professional work across mobile applications, frontend web development, debugging, UI systems, and cross-functional collaboration." />
@@ -1436,7 +1458,7 @@ function Experience() {
 
 function Contact() {
   return (
-    <section id="contact" className="relative overflow-hidden px-6 py-32 text-white">
+    <section id="contact" className={`relative overflow-hidden px-6 py-32 text-white ${sectionVisibilityClass}`}>
       <SectionBridge />
       <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative z-10 mx-auto max-w-5xl rounded-[2.5rem] border border-white/10 bg-[#070b12]/70 p-8 text-center shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-14">
         <Rocket className="mx-auto mb-6 h-10 w-10 text-sky-300" />
