@@ -89,8 +89,9 @@ const springResetTransition = { type: "spring", stiffness: 170, damping: 20 };
 const smoothResetDuration = 650;
 
 function LivingBackground() {
-  const { isSmallScreen, reduceAmbientMotion } = useMotionPolicy();
-  const particleCount = isSmallScreen ? 20 : 90;
+  const isSmallScreen = useIsSmallScreen();
+  const prefersReducedMotion = useReducedMotion();
+  const particleCount = isSmallScreen ? 44 : 90;
 
   const particles = useMemo(
     () =>
@@ -108,7 +109,7 @@ function LivingBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#05070c]">
       <motion.div
-        animate={reduceAmbientMotion ? undefined : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+        animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
         className="absolute -inset-[20%] opacity-55 blur-3xl"
         style={{
@@ -125,7 +126,7 @@ function LivingBackground() {
           key={particle.id}
           className="absolute rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.75)]"
           style={{ left: particle.left, top: particle.top, width: particle.size, height: particle.size }}
-          animate={reduceAmbientMotion ? { opacity: 0.24 } : { y: [0, -24, 0], opacity: [0.12, 0.75, 0.12], scale: [1, 1.7, 1] }}
+          animate={prefersReducedMotion ? { opacity: 0.28 } : { y: [0, -24, 0], opacity: [0.12, 0.75, 0.12], scale: [1, 1.7, 1] }}
           transition={{ duration: particle.duration + 2, delay: particle.delay, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
@@ -137,7 +138,7 @@ function LivingBackground() {
 }
 
 function NetworkMap() {
-  const { reduceAmbientMotion } = useMotionPolicy();
+  const prefersReducedMotion = useReducedMotion();
   const lines = [
     "M40 130 C180 20 260 250 420 120 S650 160 840 60",
     "M80 380 C210 260 340 480 520 330 S710 250 860 390",
@@ -157,7 +158,7 @@ function NetworkMap() {
             strokeWidth={index === 3 ? "0.9" : "1.2"}
             strokeDasharray="9 16"
             initial={{ pathLength: 0 }}
-            animate={reduceAmbientMotion ? { pathLength: 1, opacity: 0.35 } : { pathLength: [0, 1, 0], opacity: [0.08, 0.5, 0.08] }}
+            animate={prefersReducedMotion ? { pathLength: 1, opacity: 0.35 } : { pathLength: [0, 1, 0], opacity: [0.08, 0.5, 0.08] }}
             transition={{ duration: 16 + index * 2, repeat: Infinity, delay: index * 0.9, ease: "easeInOut" }}
           />
         ))}
@@ -167,7 +168,7 @@ function NetworkMap() {
 }
 
 function HologramCore() {
-  const { reduceAmbientMotion } = useMotionPolicy();
+  const prefersReducedMotion = useReducedMotion();
   const rings = [
     { size: "h-[320px] w-[320px] sm:h-[420px] sm:w-[420px] lg:h-[520px] lg:w-[520px]", speed: 28, border: "border-sky-300/20" },
     { size: "h-[255px] w-[255px] sm:h-[335px] sm:w-[335px] lg:h-[405px] lg:w-[405px]", speed: 38, border: "border-white/14", reverse: true },
@@ -186,20 +187,20 @@ function HologramCore() {
       {rings.map((ring, index) => (
         <motion.div
           key={ring.size}
-          animate={reduceAmbientMotion ? undefined : { rotate: ring.reverse ? -360 : 360 }}
+          animate={prefersReducedMotion ? undefined : { rotate: ring.reverse ? -360 : 360 }}
           transition={{ duration: ring.speed, repeat: Infinity, ease: "linear" }}
           className={`absolute left-1/2 top-1/2 ${ring.size} -translate-x-1/2 -translate-y-1/2 rounded-full border ${ring.border}`}
         >
           <motion.span
             className="absolute -top-1 left-1/2 h-3 w-3 rounded-full bg-sky-300 shadow-[0_0_26px_rgba(125,211,252,1)]"
-            animate={reduceAmbientMotion ? { opacity: 0.75 } : { scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
+            animate={prefersReducedMotion ? { opacity: 0.75 } : { scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 2.4, delay: index * 0.3, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
       ))}
 
       <motion.div
-        animate={reduceAmbientMotion ? undefined : { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
+        animate={prefersReducedMotion ? undefined : { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         className="absolute left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/15 bg-[#070b12]/70 p-5 shadow-2xl shadow-sky-500/10 backdrop-blur-2xl"
       >
@@ -220,7 +221,7 @@ function HologramCore() {
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/10">
                 <motion.div
-                  animate={reduceAmbientMotion ? { width: "99%" } : { width: ["22%", "99%", "61%", "99%"] }}
+                  animate={{ width: ["22%", "99%", "61%", "99%"] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   className="h-full rounded-full bg-gradient-to-r from-sky-300 to-white"
                 />
@@ -236,7 +237,7 @@ function HologramCore() {
               {["React", "Swift", "C++", "Next"].map((item, index) => (
                 <motion.div
                   key={item}
-                  animate={reduceAmbientMotion ? { x: 0, opacity: 0.9 } : { x: [0, 5, 0], opacity: [0.72, 1, 0.72] }}
+                  animate={{ x: [0, 5, 0], opacity: [0.72, 1, 0.72] }}
                   transition={{ duration: 3, delay: index * 0.25, repeat: Infinity, ease: "easeInOut" }}
                   className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-black text-white"
                 >
@@ -252,7 +253,7 @@ function HologramCore() {
 }
 
 function FloatingPanels() {
-  const { reduceAmbientMotion } = useMotionPolicy();
+  const prefersReducedMotion = useReducedMotion();
   const panels = [
     { text: "npm run build  ✓", top: "18%", left: "6%", rotate: -7, delay: 0 },
     { text: "animation engine online", top: "27%", left: "73%", rotate: 6, delay: 0.4 },
@@ -266,7 +267,7 @@ function FloatingPanels() {
         <motion.div
           key={panel.text}
           initial={{ opacity: 0, y: 20, rotate: panel.rotate }}
-          animate={reduceAmbientMotion ? { opacity: 0.62, y: 0, rotate: panel.rotate } : { opacity: 0.62, y: [0, -12, 0], rotate: [panel.rotate, panel.rotate + 1.5, panel.rotate] }}
+          animate={prefersReducedMotion ? { opacity: 0.62, y: 0, rotate: panel.rotate } : { opacity: 0.62, y: [0, -12, 0], rotate: [panel.rotate, panel.rotate + 1.5, panel.rotate] }}
           transition={{ opacity: { delay: panel.delay, duration: 1 }, y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay }, rotate: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay } }}
           className="absolute rounded-2xl border border-sky-300/15 bg-[#070b12]/55 px-5 py-3 font-mono text-xs text-sky-100 shadow-2xl shadow-black/30 backdrop-blur-xl"
           style={{ top: panel.top, left: panel.left }}
@@ -279,12 +280,10 @@ function FloatingPanels() {
 }
 
 function MagneticButton({ children, href, variant = "primary" }) {
-  const { canHover } = useMotionPolicy();
-
   return (
     <motion.a
       href={href}
-      whileHover={canHover ? { y: -3, scale: 1.02 } : undefined}
+      whileHover={{ y: -3, scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${
         variant === "primary"
@@ -344,7 +343,6 @@ function Navbar() {
 }
 
 function Hero() {
-  const { reduceAmbientMotion } = useMotionPolicy();
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 0.35], [0, -90]);
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
@@ -354,7 +352,7 @@ function Hero() {
       <NetworkMap />
       <FloatingPanels />
 
-      <motion.div style={reduceAmbientMotion ? undefined : { y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-16 px-6 pt-28 pb-20 text-center sm:text-left lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
+      <motion.div style={{ y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-16 px-6 pt-28 pb-20 text-center sm:text-left lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
         <div className="mx-auto max-w-3xl sm:mx-0 sm:max-w-none">
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }} className="mx-auto mb-6 inline-flex w-fit items-center gap-2 rounded-full sm:mx-0 border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-sky-100 backdrop-blur">
             <Sparkles className="h-4 w-4" /> Software Engineer / iOS / Frontend
@@ -407,7 +405,7 @@ function ProjectCard({ project, index }) {
       viewport={{ once: true, amount: 0.18 }}
       transition={{ duration: 0.55, delay: index * 0.04 }}
       whileHover={canHover ? { y: -12, scale: 1.015 } : undefined}
-      className="group relative transform-gpu overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 outline-none backdrop-blur transition-colors duration-300 focus-visible:border-sky-300/60 focus-visible:ring-2 focus-visible:ring-sky-300/40 md:hover:border-sky-300/35 md:hover:bg-white/[0.055] md:hover:shadow-sky-950/30"
+      className="group relative transform-gpu overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-colors duration-300 md:hover:border-sky-300/35 md:hover:bg-white/[0.055] md:hover:shadow-sky-950/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity duration-500 md:group-hover:opacity-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.16),transparent_45%)]" />
@@ -419,7 +417,7 @@ function ProjectCard({ project, index }) {
           <ExternalLink className="h-5 w-5 text-slate-500 transition md:group-hover:translate-x-1 md:group-hover:-translate-y-1 md:group-hover:text-sky-200" />
         </div>
         <h3 className="text-2xl font-black text-white">{project.title}</h3>
-        <p className="mt-4 min-h-24 leading-7 text-slate-400">{project.description}</p>
+        <p className="mt-4 min-h-28 leading-7 text-slate-400">{project.description}</p>
         <div className="mt-7 flex flex-wrap gap-2">
           {project.tech.map((item) => (
             <span key={item} className="rounded-full bg-[#05070c]/70 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10 transition md:group-hover:ring-sky-300/20">{item}</span>
@@ -446,28 +444,26 @@ function Work() {
 
 function SkillFlipCard({ item, index }) {
   const [flipped, setFlipped] = useState(false);
-  const { canHover } = useMotionPolicy();
   const Icon = item.icon;
 
   return (
     <motion.button
       type="button"
       onClick={() => setFlipped(!flipped)}
-      aria-expanded={flipped}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={canHover ? { y: -10, scale: 1.02 } : undefined}
+      whileHover={{ y: -10, scale: 1.02 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group h-72 text-left outline-none [perspective:1200px] focus-visible:ring-2 focus-visible:ring-sky-300/40 focus-visible:ring-offset-4 focus-visible:ring-offset-[#05070c]"
+      className="group h-72 text-left [perspective:1200px]"
     >
       <motion.div
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.65, ease: "easeInOut" }}
         className="relative h-full rounded-[2rem] [transform-style:preserve-3d]"
       >
-        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.035] p-7 shadow-2xl shadow-black/20 backdrop-blur transition-colors duration-300 md:group-hover:border-sky-300/35 md:group-hover:bg-white/[0.055] md:group-hover:shadow-sky-950/30 [backface-visibility:hidden]">
-          <Icon className="mb-6 h-8 w-8 text-sky-300 transition-transform duration-500 md:group-hover:scale-110 md:group-hover:rotate-3" />
+        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.035] p-7 shadow-2xl shadow-black/20 backdrop-blur transition-all duration-500 group-hover:border-sky-300/35 group-hover:bg-white/[0.055] group-hover:shadow-sky-950/30 [backface-visibility:hidden]">
+          <Icon className="mb-6 h-8 w-8 text-sky-300 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
           <h3 className="text-xl font-black text-white">{item.title}</h3>
           <p className="mt-4 leading-7 text-slate-400">{item.front}</p>
           <p className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-sky-300/80">Click to flip</p>
@@ -483,7 +479,7 @@ function SkillFlipCard({ item, index }) {
 }
 
 function Skills() {
-  const { reduceAmbientMotion } = useMotionPolicy();
+  const prefersReducedMotion = useReducedMotion();
   const repeated = useMemo(() => [...skills, ...skills, ...skills], []);
   return (
     <section id="skills" className={`relative overflow-hidden py-[4.5rem] text-white sm:py-32 ${sectionVisibilityClass}`}>
@@ -493,7 +489,7 @@ function Skills() {
         <div className="relative mx-auto max-w-7xl overflow-hidden">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#05070c] to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#05070c] to-transparent" />
-          <motion.div animate={reduceAmbientMotion ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
+          <motion.div animate={prefersReducedMotion ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
             {repeated.map((skill, index) => <div key={`${skill}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-4 text-lg font-black text-white shadow-xl shadow-black/20">{skill}</div>)}
           </motion.div>
         </div>
@@ -1276,29 +1272,6 @@ function useMediaQuery(query, defaultValue = false) {
   return matches;
 }
 
-function useMotionPolicy() {
-  const isSmallScreen = useIsSmallScreen();
-  const isTouchLike = useMediaQuery("(hover: none), (pointer: coarse)", false);
-  const prefersReducedMotion = useReducedMotion();
-  const reduceAmbientMotion = Boolean(prefersReducedMotion || isSmallScreen || isTouchLike);
-  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)", true);
-
-  return { isSmallScreen, isTouchLike, prefersReducedMotion, reduceAmbientMotion, canHover };
-}
-
-function MobileToyboxPreview() {
-  return (
-    <section className={`relative overflow-hidden px-6 py-[4.5rem] text-white lg:hidden ${sectionVisibilityClass}`}>
-      <SectionBridge />
-      <div className="relative z-10 mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 text-center shadow-2xl shadow-black/25 backdrop-blur">
-        <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-sky-300">Interactive Work</p>
-        <h2 className="text-3xl font-black tracking-tight text-white">Motion-driven interfaces without the mobile clutter.</h2>
-        <p className="mt-4 leading-7 text-slate-400">The desktop version includes an interactive Toybox. On mobile, this section stays fast, readable, and focused.</p>
-      </div>
-    </section>
-  );
-}
-
 function Toybox() {
   const [resetSignal, setResetSignal] = useState(0);
   const [activeMode, setActiveMode] = useState("motion");
@@ -1515,9 +1488,9 @@ function Contact() {
         <h2 className="text-4xl font-black tracking-tight sm:text-6xl">Ready to build something memorable?</h2>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-300">I’m open to web projects, frontend work, mobile development opportunities, and client-focused website updates.</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <a href="mailto:Roshan.arun@live.com" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-black text-[#05070c] outline-none transition hover:bg-sky-200 focus-visible:ring-2 focus-visible:ring-sky-300/50 focus-visible:ring-offset-4 focus-visible:ring-offset-[#070b12]"><Mail className="h-4 w-4" /> Email Me</a>
-          <a href="https://github.com/RoshanArun" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sky-300/40 focus-visible:ring-offset-4 focus-visible:ring-offset-[#070b12]"><span className="text-base">⌘</span> GitHub</a>
-          <a href="https://www.linkedin.com/in/roshan-arun-231a131b5/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sky-300/40 focus-visible:ring-offset-4 focus-visible:ring-offset-[#070b12]"><span className="text-base font-bold">in</span> LinkedIn</a>
+          <a href="mailto:Roshan.arun@live.com" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-black text-[#05070c] transition hover:bg-sky-200"><Mail className="h-4 w-4" /> Email Me</a>
+          <a href="https://github.com/RoshanArun" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><span className="text-base">⌘</span> GitHub</a>
+          <a href="https://www.linkedin.com/in/roshan-arun-231a131b5/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><span className="text-base font-bold">in</span> LinkedIn</a>
         </div>
       </motion.div>
     </section>
@@ -1537,13 +1510,6 @@ export default function App() {
     document.body.style.backgroundColor = "#05070c";
     document.body.style.margin = "0";
     document.body.style.overscrollBehaviorX = "none";
-    document.documentElement.style.scrollPaddingTop = "108px";
-    document.title = "Roshan Arun | iOS & Frontend Software Engineer";
-
-    const metaDescription = document.querySelector('meta[name="description"]') || document.createElement("meta");
-    metaDescription.setAttribute("name", "description");
-    metaDescription.setAttribute("content", "Portfolio of Roshan Arun, a software engineer focused on iOS, frontend systems, Swift, React, TypeScript, and polished user experiences.");
-    if (!metaDescription.parentNode) document.head.appendChild(metaDescription);
 
     const handleAnchorClick = (event) => {
       const anchor = event.target.closest?.('a[href^="#"]');
@@ -1560,7 +1526,6 @@ export default function App() {
     document.addEventListener("click", handleAnchorClick);
     return () => {
       document.documentElement.style.scrollBehavior = "auto";
-      document.documentElement.style.scrollPaddingTop = "";
       document.removeEventListener("click", handleAnchorClick);
     };
   }, []);
@@ -1573,7 +1538,6 @@ export default function App() {
       <Hero />
       <Work />
       <Skills />
-      <MobileToyboxPreview />
       <Toybox />
       <Experience />
       <Contact />
