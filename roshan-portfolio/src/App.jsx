@@ -430,7 +430,7 @@ function ProjectCard({ project, index }) {
 
 function Work() {
   return (
-    <section id="work" className={`relative overflow-hidden px-6 py-24 text-white sm:py-32 ${sectionVisibilityClass}`}>
+    <section id="work" className={`relative overflow-hidden px-6 py-[4.5rem] text-white sm:py-32 ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Selected Work" title="Projects built with clean structure and sharp execution." description="A mix of real experience and mock portfolio-ready projects designed to show frontend, mobile, animation, and product thinking." />
@@ -482,7 +482,7 @@ function Skills() {
   const prefersReducedMotion = useReducedMotion();
   const repeated = useMemo(() => [...skills, ...skills, ...skills], []);
   return (
-    <section id="skills" className={`relative overflow-hidden py-24 text-white sm:py-32 ${sectionVisibilityClass}`}>
+    <section id="skills" className={`relative overflow-hidden py-[4.5rem] text-white sm:py-32 ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Stack" title="The tools behind the build." description="Mobile, web, UI systems, API integration, and performance-focused development." />
@@ -1343,7 +1343,7 @@ function Toybox() {
   const modeNames = useMemo(() => Object.keys(modeCopy), [modeCopy]);
 
   return (
-    <section id="toybox" className="relative hidden overflow-hidden px-4 py-24 text-white sm:px-6 sm:py-32 lg:block">
+    <section id="toybox" className="relative hidden overflow-hidden px-4 py-[4.5rem] text-white sm:px-6 sm:py-32 lg:block">
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader
@@ -1455,7 +1455,7 @@ function Toybox() {
 
 function Experience() {
   return (
-    <section id="experience" className={`relative overflow-hidden px-6 py-24 text-white sm:py-32 ${sectionVisibilityClass}`}>
+    <section id="experience" className={`relative overflow-hidden px-6 py-[4.5rem] text-white sm:py-32 ${sectionVisibilityClass}`}>
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader eyebrow="Experience" title="Real-world software development experience." description="Professional work across mobile applications, frontend web development, debugging, UI systems, and cross-functional collaboration." />
@@ -1481,7 +1481,7 @@ function Experience() {
 
 function Contact() {
   return (
-    <section id="contact" className={`relative overflow-hidden px-6 py-24 text-white sm:py-32 ${sectionVisibilityClass}`}>
+    <section id="contact" className={`relative overflow-hidden px-6 pt-[4.5rem] pb-9 text-white sm:py-32 ${sectionVisibilityClass}`}>
       <SectionBridge />
       <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative z-10 mx-auto max-w-5xl rounded-[2.5rem] border border-white/10 bg-[#070b12]/70 p-8 text-center shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-14">
         <Rocket className="mx-auto mb-6 h-10 w-10 text-sky-300" />
@@ -1541,7 +1541,7 @@ export default function App() {
       <Toybox />
       <Experience />
       <Contact />
-      <footer className="relative z-10 border-t border-white/10 px-6 py-8 text-center text-sm text-slate-500">© {new Date().getFullYear()} Roshan Arun. Built with React, Tailwind CSS, and Framer Motion.</footer>
+      <footer className="relative z-10 border-t border-white/10 px-6 py-4 text-center text-sm text-slate-500 sm:py-8">© {new Date().getFullYear()} Roshan Arun. Built with React, Tailwind CSS, and Framer Motion.</footer>
     </main>
   );
 }
