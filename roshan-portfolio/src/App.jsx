@@ -138,25 +138,27 @@ function LivingBackground() {
 }
 
 function NetworkMap() {
+  const prefersReducedMotion = useReducedMotion();
   const lines = [
     "M40 130 C180 20 260 250 420 120 S650 160 840 60",
     "M80 380 C210 260 340 480 520 330 S710 250 860 390",
     "M120 80 C280 170 360 20 520 140 S720 250 880 120",
+    "M20 250 C180 160 280 320 455 230 S700 120 890 280",
   ];
 
   return (
-    <div className="pointer-events-none absolute inset-0 hidden opacity-80 xl:block">
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 900 520" preserveAspectRatio="none">
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-45 sm:opacity-60 xl:opacity-80">
+      <svg className="absolute inset-0 h-full w-full scale-[1.18] sm:scale-105 xl:scale-100" viewBox="0 0 900 520" preserveAspectRatio="none">
         {lines.map((line, index) => (
           <motion.path
             key={line}
             d={line}
             fill="none"
-            stroke={index === 1 ? "rgba(255,255,255,0.16)" : "rgba(56,189,248,0.22)"}
-            strokeWidth="1.2"
+            stroke={index === 1 ? "rgba(255,255,255,0.14)" : "rgba(56,189,248,0.20)"}
+            strokeWidth={index === 3 ? "0.9" : "1.2"}
             strokeDasharray="9 16"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: [0, 1, 0], opacity: [0.1, 0.55, 0.1] }}
+            animate={prefersReducedMotion ? { pathLength: 1, opacity: 0.35 } : { pathLength: [0, 1, 0], opacity: [0.08, 0.5, 0.08] }}
             transition={{ duration: 16 + index * 2, repeat: Infinity, delay: index * 0.9, ease: "easeInOut" }}
           />
         ))}
@@ -178,7 +180,7 @@ function HologramCore() {
       initial={{ opacity: 0, scale: 0.92, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.35, ease: "easeOut" }}
-      className="relative mx-auto mt-20 h-[360px] w-full max-w-xl sm:mt-10 sm:h-[460px] lg:mt-0 lg:h-[620px]"
+      className="relative mx-auto mt-16 h-[360px] w-full max-w-xl sm:h-[460px] lg:mt-0 lg:h-[620px]"
     >
       <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-3xl" />
 
@@ -260,12 +262,12 @@ function FloatingPanels() {
   ];
 
   return (
-    <div className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
+    <div className="pointer-events-none absolute inset-0 z-20 hidden overflow-hidden [@media(min-width:1536px)]:block">
       {panels.map((panel) => (
         <motion.div
           key={panel.text}
-          initial={{ opacity: 0, y: 30, rotate: panel.rotate }}
-          animate={prefersReducedMotion ? { opacity: 0.72, y: 0, rotate: panel.rotate } : { opacity: 0.72, y: [0, -18, 0], rotate: [panel.rotate, panel.rotate + 2, panel.rotate] }}
+          initial={{ opacity: 0, y: 20, rotate: panel.rotate }}
+          animate={prefersReducedMotion ? { opacity: 0.62, y: 0, rotate: panel.rotate } : { opacity: 0.62, y: [0, -12, 0], rotate: [panel.rotate, panel.rotate + 1.5, panel.rotate] }}
           transition={{ opacity: { delay: panel.delay, duration: 1 }, y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay }, rotate: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay } }}
           className="absolute rounded-2xl border border-sky-300/15 bg-[#070b12]/55 px-5 py-3 font-mono text-xs text-sky-100 shadow-2xl shadow-black/30 backdrop-blur-xl"
           style={{ top: panel.top, left: panel.left }}
@@ -297,7 +299,8 @@ function MagneticButton({ children, href, variant = "primary" }) {
 
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const links = ["work", "skills", "toybox", "experience", "contact"];
+  const showToybox = useMediaQuery("(min-width: 1024px)", true);
+  const links = showToybox ? ["work", "skills", "toybox", "experience", "contact"] : ["work", "skills", "experience", "contact"];
 
   return (
     <motion.nav initial={{ y: -80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }} className="fixed left-0 right-0 top-0 z-50 px-4 py-4">
@@ -349,7 +352,7 @@ function Hero() {
       <NetworkMap />
       <FloatingPanels />
 
-      <motion.div style={{ y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-6 pt-28 pb-20 text-center sm:text-left lg:grid-cols-[1.02fr_0.98fr]">
+      <motion.div style={{ y, opacity }} className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-16 px-6 pt-28 pb-20 text-center sm:text-left lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
         <div className="mx-auto max-w-3xl sm:mx-0 sm:max-w-none">
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }} className="mx-auto mb-6 inline-flex w-fit items-center gap-2 rounded-full sm:mx-0 border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-sky-100 backdrop-blur">
             <Sparkles className="h-4 w-4" /> Software Engineer / iOS / Frontend
@@ -397,12 +400,12 @@ function ProjectCard({ project, index }) {
       href={project.link}
       target={project.link === "#" ? undefined : "_blank"}
       rel="noreferrer"
-      initial={{ opacity: 0, y: isSmallScreen ? 18 : 40 }}
+      initial={{ opacity: 0, y: isSmallScreen ? 22 : 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: isSmallScreen ? 0.18 : 0.25, margin: isSmallScreen ? "0px 0px -24px 0px" : "-80px" }}
-      transition={{ duration: isSmallScreen ? 0.45 : 0.65, delay: isSmallScreen ? index * 0.04 : index * 0.08, ease: "easeOut" }}
+      viewport={{ once: true, margin: isSmallScreen ? "-20px" : "-80px" }}
+      transition={{ duration: 0.55, delay: isSmallScreen ? index * 0.04 : index * 0.08 }}
       whileHover={isSmallScreen ? undefined : { y: -12, scale: 1.015 }}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-colors duration-500 hover:border-sky-300/35 hover:bg-white/[0.055] hover:shadow-sky-950/30"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-all duration-500 hover:border-sky-300/35 hover:bg-white/[0.055] hover:shadow-sky-950/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.16),transparent_45%)]" />
@@ -1251,6 +1254,24 @@ function useIsSmallScreen() {
   return isSmall;
 }
 
+function useMediaQuery(query, defaultValue = false) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === "undefined") return defaultValue;
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, [query]);
+
+  return matches;
+}
+
 function Toybox() {
   const [resetSignal, setResetSignal] = useState(0);
   const [activeMode, setActiveMode] = useState("motion");
@@ -1322,7 +1343,7 @@ function Toybox() {
   const modeNames = useMemo(() => Object.keys(modeCopy), [modeCopy]);
 
   return (
-    <section id="toybox" className="relative overflow-hidden px-4 py-24 text-white sm:px-6 sm:py-32">
+    <section id="toybox" className="relative hidden overflow-hidden px-4 py-24 text-white sm:px-6 sm:py-32 lg:block">
       <SectionBridge />
       <div className="relative z-10">
         <SectionHeader
@@ -1484,46 +1505,28 @@ function ProgressBar() {
 
 export default function App() {
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const previousHtmlScrollBehavior = html.style.scrollBehavior;
-    const previousHtmlBg = html.style.backgroundColor;
-    const previousBodyBg = body.style.backgroundColor;
-    const previousBodyMargin = body.style.margin;
-    const previousBodyOverscroll = body.style.overscrollBehaviorY;
-
-    html.style.scrollBehavior = "smooth";
-    html.style.backgroundColor = "#05070c";
-    body.style.backgroundColor = "#05070c";
-    body.style.margin = "0";
-    body.style.overscrollBehaviorY = "none";
+    document.documentElement.style.scrollBehavior = "smooth";
+    document.documentElement.style.backgroundColor = "#05070c";
+    document.body.style.backgroundColor = "#05070c";
+    document.body.style.margin = "0";
+    document.body.style.overscrollBehaviorX = "none";
 
     const handleAnchorClick = (event) => {
-      const link = event.target.closest('a[href^="#"]');
-      if (!link) return;
-
-      const hash = link.getAttribute("href");
-      if (!hash || hash === "#") return;
-
-      const target = document.querySelector(hash);
+      const anchor = event.target.closest?.('a[href^="#"]');
+      if (!anchor) return;
+      const id = anchor.getAttribute("href")?.slice(1);
+      const target = id ? document.getElementById(id) : null;
       if (!target) return;
-
       event.preventDefault();
-      const navbarOffset = window.innerWidth < 768 ? 88 : 104;
+      const navbarOffset = window.innerWidth < 768 ? 92 : 108;
       const top = target.getBoundingClientRect().top + window.scrollY - navbarOffset;
-      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-      window.history.pushState(null, "", hash);
+      window.scrollTo({ top, behavior: "smooth" });
     };
 
     document.addEventListener("click", handleAnchorClick);
-
     return () => {
+      document.documentElement.style.scrollBehavior = "auto";
       document.removeEventListener("click", handleAnchorClick);
-      html.style.scrollBehavior = previousHtmlScrollBehavior;
-      html.style.backgroundColor = previousHtmlBg;
-      body.style.backgroundColor = previousBodyBg;
-      body.style.margin = previousBodyMargin;
-      body.style.overscrollBehaviorY = previousBodyOverscroll;
     };
   }, []);
 
