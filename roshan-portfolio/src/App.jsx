@@ -224,15 +224,9 @@ function HologramCore() {
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/10">
                 <motion.div
-                  animate={{
-                    scaleX: [0.22, 0.99, 0.72, 0.99],
-                  }}
-                  transition={{
-                    duration: 6.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="h-full origin-left rounded-full bg-gradient-to-r from-sky-300 to-white will-change-transform"
+                  animate={{ width: ["22%", "99%", "61%", "99%"] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="h-full rounded-full bg-gradient-to-r from-sky-300 to-white"
                 />
               </div>
               <div className="mt-5 space-y-3 font-mono text-xs text-slate-300 sm:text-sm">
@@ -294,10 +288,11 @@ function MagneticButton({ children, href, variant = "primary" }) {
       href={href}
       whileHover={{ y: -3, scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
-      className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${variant === "primary"
+      className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${
+        variant === "primary"
           ? "bg-white text-[#05070c] shadow-2xl shadow-sky-400/20 hover:bg-sky-200"
           : "border border-white/15 bg-white/5 text-white backdrop-blur hover:border-sky-300/50 hover:bg-white/10"
-        }`}
+      }`}
     >
       {children}
       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -633,19 +628,19 @@ function MotionPlayground({ resetSignal }) {
   const prefersReducedMotion = useReducedMotion();
   const toys = isSmallScreen
     ? [
-      { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
-      { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
-      { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
-      { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
-      { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
-    ]
+        { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
+        { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
+        { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
+        { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
+        { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
+      ]
     : [
-      { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
-      { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
-      { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
-      { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
-      { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
-    ];
+        { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
+        { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
+        { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
+        { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
+        { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
+      ];
 
   const toyClass = (shape) => {
     if (shape === "orb") {
@@ -867,8 +862,9 @@ const SystemsNode = React.memo(function SystemsNode({ node, pixel, onStartDrag, 
       initial={false}
       animate={{ left: pixel.x, top: pixel.y }}
       transition={resetAnimating ? springResetTransition : { duration: 0 }}
-      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
-        }`}
+      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
+        selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
+      }`}
     >
       <span className="line-clamp-2 leading-tight">{children}</span>
     </motion.button>
@@ -1444,10 +1440,11 @@ function Toybox() {
                     setActiveMode(modeName);
                     setResetSignal((value) => value + 1);
                   }}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${activeMode === modeName
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
+                    activeMode === modeName
                       ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
                       : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                    }`}
+                  }`}
                 >
                   {modeName}
                 </button>
