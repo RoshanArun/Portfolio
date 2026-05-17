@@ -87,6 +87,9 @@ const experience = [
 const sectionVisibilityClass = "";
 const springResetTransition = { type: "spring", stiffness: 170, damping: 20 };
 const smoothResetDuration = 650;
+const DEFAULT_TOY_HOVER = { scale: 1.04 };
+const flipTransition = { type: "spring", stiffness: 260, damping: 28, mass: 0.85 };
+
 
 function LivingBackground() {
   const isSmallScreen = useIsSmallScreen();
@@ -221,9 +224,15 @@ function HologramCore() {
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/10">
                 <motion.div
-                  animate={{ width: ["22%", "99%", "61%", "99%"] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="h-full rounded-full bg-gradient-to-r from-sky-300 to-white"
+                  animate={{
+                    scaleX: [0.22, 0.99, 0.72, 0.99],
+                  }}
+                  transition={{
+                    duration: 6.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="h-full origin-left rounded-full bg-gradient-to-r from-sky-300 to-white will-change-transform"
                 />
               </div>
               <div className="mt-5 space-y-3 font-mono text-xs text-slate-300 sm:text-sm">
@@ -285,11 +294,10 @@ function MagneticButton({ children, href, variant = "primary" }) {
       href={href}
       whileHover={{ y: -3, scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
-      className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${
-        variant === "primary"
+      className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${variant === "primary"
           ? "bg-white text-[#05070c] shadow-2xl shadow-sky-400/20 hover:bg-sky-200"
           : "border border-white/15 bg-white/5 text-white backdrop-blur hover:border-sky-300/50 hover:bg-white/10"
-      }`}
+        }`}
     >
       {children}
       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -382,7 +390,7 @@ function SectionBridge() {
   return <div className="pointer-events-none absolute -top-56 left-0 right-0 h-[28rem] bg-[linear-gradient(to_bottom,transparent_0%,rgba(5,7,12,0.28)_45%,transparent_100%)]" />;
 }
 
-function SectionHeader({ eyebrow, title, description }) {
+const SectionHeader = React.memo(function SectionHeader({ eyebrow, title, description }) {
   return (
     <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7 }} className="mx-auto mb-10 max-w-3xl text-center sm:mb-14">
       <p className="mb-3 text-sm font-black uppercase tracking-[0.32em] text-sky-300">{eyebrow}</p>
@@ -390,9 +398,9 @@ function SectionHeader({ eyebrow, title, description }) {
       <p className="mt-5 text-lg leading-8 text-slate-400">{description}</p>
     </motion.div>
   );
-}
+});
 
-function ProjectCard({ project, index }) {
+const ProjectCard = React.memo(function ProjectCard({ project, index }) {
   const canHover = useMediaQuery("(hover: hover) and (pointer: fine)", true);
 
   return (
@@ -426,7 +434,7 @@ function ProjectCard({ project, index }) {
       </div>
     </motion.a>
   );
-}
+});
 
 function Work() {
   return (
@@ -442,33 +450,37 @@ function Work() {
   );
 }
 
-function SkillFlipCard({ item, index }) {
+const SkillFlipCard = React.memo(function SkillFlipCard({ item, index }) {
   const [flipped, setFlipped] = useState(false);
   const Icon = item.icon;
+  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)", true);
+  const toggleFlipped = useCallback(() => setFlipped((value) => !value), []);
 
   return (
     <motion.button
       type="button"
-      onClick={() => setFlipped(!flipped)}
+      onClick={toggleFlipped}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -10, scale: 1.02 }}
-      viewport={{ once: true }}
+      whileHover={canHover ? { y: -10, scale: 1.02 } : undefined}
+      whileTap={{ scale: 0.985 }}
+      viewport={{ once: true, amount: 0.22 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group h-72 text-left [perspective:1200px]"
+      className="group h-72 touch-manipulation text-left outline-none [perspective:1200px] [perspective-origin:center] [transform:translateZ(0)]"
     >
       <motion.div
+        initial={false}
         animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.65, ease: "easeInOut" }}
-        className="relative h-full rounded-[2rem] [transform-style:preserve-3d]"
+        transition={flipTransition}
+        className="relative h-full rounded-[2rem] will-change-transform [backface-visibility:hidden] [transform-style:preserve-3d] [transform:translateZ(0)]"
       >
-        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.035] p-7 shadow-2xl shadow-black/20 backdrop-blur transition-all duration-500 group-hover:border-sky-300/35 group-hover:bg-white/[0.055] group-hover:shadow-sky-950/30 [backface-visibility:hidden]">
+        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.035] p-7 shadow-2xl shadow-black/20 backdrop-blur transition-colors duration-500 group-hover:border-sky-300/35 group-hover:bg-white/[0.055] group-hover:shadow-sky-950/30 [backface-visibility:hidden] [transform:rotateY(0deg)_translateZ(1px)]">
           <Icon className="mb-6 h-8 w-8 text-sky-300 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
           <h3 className="text-xl font-black text-white">{item.title}</h3>
           <p className="mt-4 leading-7 text-slate-400">{item.front}</p>
           <p className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-sky-300/80">Click to flip</p>
         </div>
-        <div className="absolute inset-0 rounded-[2rem] border border-sky-300/20 bg-[#0b1220]/90 p-7 shadow-2xl shadow-sky-950/30 backdrop-blur [backface-visibility:hidden] [transform:rotateY(180deg)]">
+        <div className="absolute inset-0 rounded-[2rem] border border-sky-300/20 bg-[#0b1220]/90 p-7 shadow-2xl shadow-sky-950/30 backdrop-blur [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]">
           <h3 className="text-xl font-black text-white">How I use it</h3>
           <p className="mt-5 leading-7 text-slate-300">{item.back}</p>
           <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-sky-300/80">Click to return</p>
@@ -476,7 +488,7 @@ function SkillFlipCard({ item, index }) {
       </motion.div>
     </motion.button>
   );
-}
+});
 
 function Skills() {
   const prefersReducedMotion = useReducedMotion();
@@ -502,7 +514,7 @@ function Skills() {
   );
 }
 
-function DraggableToy({ resetSignal, initial, className = "", children, dragMomentum = true, motionStyle = {}, whileHover = { scale: 1.04 } }) {
+const DraggableToy = React.memo(function DraggableToy({ resetSignal, initial, className = "", children, dragMomentum = true, motionStyle = {}, whileHover = DEFAULT_TOY_HOVER }) {
   const controls = useAnimation();
 
   useEffect(() => {
@@ -523,13 +535,13 @@ function DraggableToy({ resetSignal, initial, className = "", children, dragMome
       animate={controls}
       whileDrag={{ scale: 1.08, zIndex: 120, rotate: 2 }}
       whileHover={whileHover}
-      className={`absolute cursor-grab select-none will-change-transform active:cursor-grabbing [touch-action:none] ${className}`}
+      className={`absolute cursor-grab select-none will-change-transform active:cursor-grabbing [touch-action:none] [transform:translateZ(0)] ${className}`}
       style={{ left: initial.left, top: initial.top, ...motionStyle }}
     >
       {children}
     </motion.div>
   );
-}
+});
 
 const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
   if (toy.kind === "magnet") {
@@ -621,19 +633,19 @@ function MotionPlayground({ resetSignal }) {
   const prefersReducedMotion = useReducedMotion();
   const toys = isSmallScreen
     ? [
-        { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
-        { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
-        { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
-        { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
-        { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
-      ]
+      { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
+      { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
+      { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
+      { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
+      { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
+    ]
     : [
-        { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
-        { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
-        { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
-        { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
-        { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
-      ];
+      { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
+      { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
+      { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
+      { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
+      { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
+    ];
 
   const toyClass = (shape) => {
     if (shape === "orb") {
@@ -743,16 +755,34 @@ function ConstellationsPlayground({ resetSignal }) {
   const startDrag = (event, point) => {
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     const rect = boardRef.current.getBoundingClientRect();
+    let latestEvent = event;
+    let frame = null;
 
-    const move = (moveEvent) => updatePoint(point.id, moveEvent.clientX, moveEvent.clientY, rect);
-    const stop = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", stop);
+    const applyMove = () => {
+      frame = null;
+      updatePoint(point.id, latestEvent.clientX, latestEvent.clientY, rect);
     };
 
-    window.addEventListener("pointermove", move);
+    const move = (moveEvent) => {
+      latestEvent = moveEvent;
+      if (frame === null) frame = window.requestAnimationFrame(applyMove);
+    };
+
+    const stop = () => {
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame);
+        applyMove();
+      }
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+    };
+
+    window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const sortedPoints = useMemo(() => [...points].sort((a, b) => a.id - b.id), [points]);
@@ -837,9 +867,8 @@ const SystemsNode = React.memo(function SystemsNode({ node, pixel, onStartDrag, 
       initial={false}
       animate={{ left: pixel.x, top: pixel.y }}
       transition={resetAnimating ? springResetTransition : { duration: 0 }}
-      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
-        selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
-      }`}
+      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
+        }`}
     >
       <span className="line-clamp-2 leading-tight">{children}</span>
     </motion.button>
@@ -955,24 +984,39 @@ function SystemsPlayground({ resetSignal }) {
   const startNodeDrag = (event, node) => {
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     const rect = boardRef.current.getBoundingClientRect();
     dragState.current = { moved: false, id: node.id, startX: event.clientX, startY: event.clientY, rect };
+    let latestEvent = event;
+    let frame = null;
+
+    const applyMove = () => {
+      frame = null;
+      const distance = Math.hypot(latestEvent.clientX - dragState.current.startX, latestEvent.clientY - dragState.current.startY);
+      if (distance > 3) dragState.current.moved = true;
+      updateNodeFromClient(node.id, latestEvent.clientX, latestEvent.clientY, rect);
+    };
 
     const move = (moveEvent) => {
-      const distance = Math.hypot(moveEvent.clientX - dragState.current.startX, moveEvent.clientY - dragState.current.startY);
-      if (distance > 3) dragState.current.moved = true;
-      updateNodeFromClient(node.id, moveEvent.clientX, moveEvent.clientY, rect);
+      latestEvent = moveEvent;
+      if (frame === null) frame = window.requestAnimationFrame(applyMove);
     };
 
     const stop = () => {
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame);
+        applyMove();
+      }
       if (!dragState.current.moved) pickNode(node.id);
       dragState.current = { moved: false, id: null, startX: 0, startY: 0, rect: null };
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
     };
 
-    window.addEventListener("pointermove", move);
+    window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const addSystem = () => {
@@ -1247,8 +1291,12 @@ function useIsSmallScreen() {
     const media = window.matchMedia("(max-width: 639px)");
     const update = () => setIsSmall(media.matches);
     update();
-    media.addEventListener?.("change", update);
-    return () => media.removeEventListener?.("change", update);
+    if (media.addEventListener) media.addEventListener("change", update);
+    else media.addListener(update);
+    return () => {
+      if (media.removeEventListener) media.removeEventListener("change", update);
+      else media.removeListener(update);
+    };
   }, []);
 
   return isSmall;
@@ -1265,8 +1313,12 @@ function useMediaQuery(query, defaultValue = false) {
     const media = window.matchMedia(query);
     const update = () => setMatches(media.matches);
     update();
-    media.addEventListener?.("change", update);
-    return () => media.removeEventListener?.("change", update);
+    if (media.addEventListener) media.addEventListener("change", update);
+    else media.addListener(update);
+    return () => {
+      if (media.removeEventListener) media.removeEventListener("change", update);
+      else media.removeListener(update);
+    };
   }, [query]);
 
   return matches;
@@ -1392,11 +1444,10 @@ function Toybox() {
                     setActiveMode(modeName);
                     setResetSignal((value) => value + 1);
                   }}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${
-                    activeMode === modeName
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition sm:px-3.5 sm:text-xs sm:tracking-[0.16em] ${activeMode === modeName
                       ? "border-sky-300/40 bg-sky-300/20 text-sky-100"
                       : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                  }`}
+                    }`}
                 >
                   {modeName}
                 </button>
