@@ -88,10 +88,78 @@ const sectionVisibilityClass = "";
 const springResetTransition = { type: "spring", stiffness: 170, damping: 20 };
 const smoothResetDuration = 650;
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+function useRafCallback(callback) {
+  const frameRef = useRef(null);
+  const lastArgsRef = useRef(null);
+  const callbackRef = useRef(callback);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => () => {
+    if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+  }, []);
+
+  return useCallback((...args) => {
+    lastArgsRef.current = args;
+    if (frameRef.current) return;
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      callbackRef.current(...lastArgsRef.current);
+    });
+  }, []);
+}
+
+function useBoardSize(ref, fallback = { width: 640, height: 420 }) {
+  const [size, setSize] = useState(fallback);
+
+  useEffect(() => {
+    const board = ref.current;
+    if (!board) return undefined;
+
+    let frame = null;
+    const updateSize = () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const rect = board.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        setSize((current) =>
+          Math.abs(current.width - rect.width) < 1 && Math.abs(current.height - rect.height) < 1
+            ? current
+            : { width: rect.width, height: rect.height }
+        );
+      });
+    };
+
+    updateSize();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateSize);
+      return () => {
+        if (frame) window.cancelAnimationFrame(frame);
+        window.removeEventListener("resize", updateSize);
+      };
+    }
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(board);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [ref]);
+
+  return size;
+}
+
 function LivingBackground() {
   const isSmallScreen = useIsSmallScreen();
   const prefersReducedMotion = useReducedMotion();
-  const particleCount = isSmallScreen ? 44 : 90;
+  const particleCount = prefersReducedMotion ? 0 : isSmallScreen ? 22 : 54;
 
   const particles = useMemo(
     () =>
@@ -169,6 +237,8 @@ function NetworkMap() {
 
 function HologramCore() {
   const prefersReducedMotion = useReducedMotion();
+  const isSmallScreen = useIsSmallScreen();
+  const shouldAnimate = !prefersReducedMotion && !isSmallScreen;
   const rings = [
     { size: "h-[320px] w-[320px] sm:h-[420px] sm:w-[420px] lg:h-[520px] lg:w-[520px]", speed: 28, border: "border-sky-300/20" },
     { size: "h-[255px] w-[255px] sm:h-[335px] sm:w-[335px] lg:h-[405px] lg:w-[405px]", speed: 38, border: "border-white/14", reverse: true },
@@ -187,20 +257,20 @@ function HologramCore() {
       {rings.map((ring, index) => (
         <motion.div
           key={ring.size}
-          animate={prefersReducedMotion ? undefined : { rotate: ring.reverse ? -360 : 360 }}
+          animate={shouldAnimate ? { rotate: ring.reverse ? -360 : 360 } : undefined}
           transition={{ duration: ring.speed, repeat: Infinity, ease: "linear" }}
           className={`absolute left-1/2 top-1/2 ${ring.size} -translate-x-1/2 -translate-y-1/2 rounded-full border ${ring.border}`}
         >
           <motion.span
             className="absolute -top-1 left-1/2 h-3 w-3 rounded-full bg-sky-300 shadow-[0_0_26px_rgba(125,211,252,1)]"
-            animate={prefersReducedMotion ? { opacity: 0.75 } : { scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
+            animate={shouldAnimate ? { scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] } : { opacity: 0.75 }}
             transition={{ duration: 2.4, delay: index * 0.3, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
       ))}
 
       <motion.div
-        animate={prefersReducedMotion ? undefined : { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
+        animate={shouldAnimate ? { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] } : undefined}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         className="absolute left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/15 bg-[#070b12]/70 p-5 shadow-2xl shadow-sky-500/10 backdrop-blur-2xl"
       >
@@ -221,7 +291,7 @@ function HologramCore() {
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/10">
                 <motion.div
-                  animate={{ width: ["22%", "99%", "61%", "99%"] }}
+                  animate={shouldAnimate ? { width: ["22%", "99%", "61%", "99%"] } : { width: "99%" }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   className="h-full rounded-full bg-gradient-to-r from-sky-300 to-white"
                 />
@@ -237,7 +307,7 @@ function HologramCore() {
               {["React", "Swift", "C++", "Next"].map((item, index) => (
                 <motion.div
                   key={item}
-                  animate={{ x: [0, 5, 0], opacity: [0.72, 1, 0.72] }}
+                  animate={shouldAnimate ? { x: [0, 5, 0], opacity: [0.72, 1, 0.72] } : { opacity: 0.9 }}
                   transition={{ duration: 3, delay: index * 0.25, repeat: Infinity, ease: "easeInOut" }}
                   className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-black text-white"
                 >
@@ -445,6 +515,8 @@ function Work() {
 function SkillFlipCard({ item, index }) {
   const [flipped, setFlipped] = useState(false);
   const Icon = item.icon;
+  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)", true);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <motion.button
@@ -452,13 +524,13 @@ function SkillFlipCard({ item, index }) {
       onClick={() => setFlipped(!flipped)}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -10, scale: 1.02 }}
+      whileHover={canHover && !prefersReducedMotion ? { y: -10, scale: 1.02 } : undefined}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
       className="group h-72 text-left [perspective:1200px]"
     >
       <motion.div
-        animate={{ rotateY: flipped ? 180 : 0 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.65, ease: "easeInOut" }}
         className="relative h-full rounded-[2rem] [transform-style:preserve-3d]"
       >
@@ -480,6 +552,7 @@ function SkillFlipCard({ item, index }) {
 
 function Skills() {
   const prefersReducedMotion = useReducedMotion();
+  const isSmallScreen = useIsSmallScreen();
   const repeated = useMemo(() => [...skills, ...skills, ...skills], []);
   return (
     <section id="skills" className={`relative overflow-hidden py-[4.5rem] text-white sm:py-32 ${sectionVisibilityClass}`}>
@@ -489,7 +562,7 @@ function Skills() {
         <div className="relative mx-auto max-w-7xl overflow-hidden">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#05070c] to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#05070c] to-transparent" />
-          <motion.div animate={prefersReducedMotion ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
+          <motion.div animate={prefersReducedMotion || isSmallScreen ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
             {repeated.map((skill, index) => <div key={`${skill}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-4 text-lg font-black text-white shadow-xl shadow-black/20">{skill}</div>)}
           </motion.div>
         </div>
@@ -532,23 +605,25 @@ function DraggableToy({ resetSignal, initial, className = "", children, dragMome
 }
 
 const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
+  const prefersReducedMotion = useReducedMotion();
+
   if (toy.kind === "magnet") {
     return (
       <div className="relative h-full w-full overflow-hidden rounded-[1.5rem] p-3">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">Magnet</div>
         <div className="relative mt-3 h-12">
           <motion.span
-            animate={{ x: [0, 34, 0], scale: [1, 1.18, 1] }}
+            animate={prefersReducedMotion ? undefined : { x: [0, 34, 0], scale: [1, 1.18, 1] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             className="absolute left-0 top-3 h-6 w-6 rounded-full border border-sky-200/35 bg-sky-300/20 shadow-[0_0_24px_rgba(125,211,252,0.45)]"
           />
           <motion.span
-            animate={{ x: [0, -34, 0], scale: [1, 1.18, 1] }}
+            animate={prefersReducedMotion ? undefined : { x: [0, -34, 0], scale: [1, 1.18, 1] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             className="absolute right-0 top-3 h-6 w-6 rounded-full border border-white/30 bg-white/10 shadow-[0_0_24px_rgba(255,255,255,0.24)]"
           />
           <motion.div
-            animate={{ opacity: [0.15, 0.75, 0.15], scaleX: [0.4, 1, 0.4] }}
+            animate={prefersReducedMotion ? { opacity: 0.55 } : { opacity: [0.15, 0.75, 0.15], scaleX: [0.4, 1, 0.4] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             className="absolute left-7 right-7 top-6 h-px origin-center bg-sky-200/60"
           />
@@ -560,10 +635,10 @@ const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
   if (toy.kind === "orbit") {
     return (
       <div className="relative grid h-full w-full place-items-center">
-        <motion.span animate={{ rotate: 360 }} transition={{ duration: 4.5, repeat: Infinity, ease: "linear" }} className="absolute inset-2 rounded-full border border-dashed border-sky-200/35">
+        <motion.span animate={prefersReducedMotion ? undefined : { rotate: 360 }} transition={{ duration: 4.5, repeat: Infinity, ease: "linear" }} className="absolute inset-2 rounded-full border border-dashed border-sky-200/35">
           <span className="absolute -top-1 left-1/2 h-3 w-3 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.95)]" />
         </motion.span>
-        <motion.span animate={{ rotate: -360 }} transition={{ duration: 7, repeat: Infinity, ease: "linear" }} className="absolute inset-8 rounded-full border border-white/15">
+        <motion.span animate={prefersReducedMotion ? undefined : { rotate: -360 }} transition={{ duration: 7, repeat: Infinity, ease: "linear" }} className="absolute inset-8 rounded-full border border-white/15">
           <span className="absolute -bottom-1 left-1/3 h-2.5 w-2.5 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.95)]" />
         </motion.span>
         <span className="text-sm">Orbit</span>
@@ -576,7 +651,7 @@ const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
       <div className="w-28 sm:w-40">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-sky-200/70"><span>Ease</span><span>curve</span></div>
         <div className="mt-3 h-1 rounded-full bg-white/10">
-          <motion.div animate={{ x: [0, 78, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }} className="h-2.5 w-2.5 -translate-y-1 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.9)]" />
+          <motion.div animate={prefersReducedMotion ? undefined : { x: [0, 78, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }} className="h-2.5 w-2.5 -translate-y-1 rounded-full bg-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.9)]" />
         </div>
       </div>
     );
@@ -590,7 +665,7 @@ const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
           {[22, 44, 30, 56, 38, 48].map((height, index) => (
             <motion.span
               key={index}
-              animate={{ height: [height, 10 + ((height + index * 11) % 52), height] }}
+              animate={prefersReducedMotion ? undefined : { height: [height, 10 + ((height + index * 11) % 52), height] }}
               transition={{ duration: 1.2 + index * 0.08, repeat: Infinity, ease: "easeInOut", delay: index * 0.04 }}
               className="w-2 rounded-full bg-sky-300/30 ring-1 ring-sky-200/25 sm:w-3"
               style={{ height }}
@@ -606,7 +681,7 @@ const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
       {[0, 1, 2].map((ring) => (
         <motion.span
           key={ring}
-          animate={{ scale: [0.15, 1.2], opacity: [0.75, 0] }}
+          animate={prefersReducedMotion ? undefined : { scale: [0.15, 1.2], opacity: [0.75, 0] }}
           transition={{ duration: 2.1, repeat: Infinity, ease: "easeOut", delay: ring * 0.45 }}
           className="absolute h-12 w-12 rounded-full border border-sky-200/45 sm:h-16 sm:w-16"
         />
@@ -619,21 +694,25 @@ const MotionToyFace = React.memo(function MotionToyFace({ toy }) {
 function MotionPlayground({ resetSignal }) {
   const isSmallScreen = useIsSmallScreen();
   const prefersReducedMotion = useReducedMotion();
-  const toys = isSmallScreen
-    ? [
-        { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
-        { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
-        { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
-        { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
-        { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
-      ]
-    : [
-        { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
-        { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
-        { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
-        { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
-        { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
-      ];
+  const toys = useMemo(
+    () =>
+      isSmallScreen
+        ? [
+            { label: "Magnet", left: "18%", top: "12%", shape: "panel", kind: "magnet" },
+            { label: "Orbit", left: "60%", top: "10%", shape: "orb", kind: "orbit" },
+            { label: "Ease", left: "44%", top: "45%", shape: "wide", kind: "ease" },
+            { label: "Signal", left: "13%", top: "72%", shape: "bars", kind: "signal" },
+            { label: "Ripple", left: "61%", top: "73%", shape: "ripple", kind: "ripple" },
+          ]
+        : [
+            { label: "Magnet", left: "6%", top: "13%", shape: "panel", kind: "magnet" },
+            { label: "Orbit", left: "66%", top: "5%", shape: "orb", kind: "orbit" },
+            { label: "Ease", left: "75%", top: "46%", shape: "wide", kind: "ease" },
+            { label: "Signal", left: "9%", top: "72%", shape: "bars", kind: "signal" },
+            { label: "Ripple", left: "56%", top: "72%", shape: "ripple", kind: "ripple" },
+          ],
+    [isSmallScreen]
+  );
 
   const toyClass = (shape) => {
     if (shape === "orb") {
@@ -686,7 +765,7 @@ function ConstellationsPlayground({ resetSignal }) {
     []
   );
   const [points, setPoints] = useState(defaultPoints);
-  const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+  const boardSize = useBoardSize(boardRef);
   const [resetAnimating, setResetAnimating] = useState(false);
 
   useEffect(() => {
@@ -696,42 +775,25 @@ function ConstellationsPlayground({ resetSignal }) {
     return () => window.clearTimeout(timer);
   }, [resetSignal, defaultPoints]);
 
-  useEffect(() => {
-    const board = boardRef.current;
-    if (!board) return;
 
-    const updateSize = () => {
-      const rect = board.getBoundingClientRect();
-      if (rect.width && rect.height) setBoardSize({ width: rect.width, height: rect.height });
-    };
-
-    updateSize();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateSize);
-      return () => window.removeEventListener("resize", updateSize);
-    }
-
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(board);
-    return () => observer.disconnect();
-  }, []);
-
-  const clampRatioPoint = (x, y) => ({
-    x: Math.min(Math.max(x, 0.04), 0.96),
-    y: Math.min(Math.max(y, 0.06), 0.94),
-  });
+  const clampRatioPoint = useCallback((x, y) => ({
+    x: clamp(x, 0.04, 0.96),
+    y: clamp(y, 0.06, 0.94),
+  }), []);
 
   const ratioToPixels = (point) => ({
     x: point.x * boardSize.width,
     y: point.y * boardSize.height,
   });
 
-  const updatePoint = (id, clientX, clientY, rectOverride) => {
+  const updatePointImmediate = useCallback((id, clientX, clientY, rectOverride) => {
     const rect = rectOverride || boardRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next = clampRatioPoint((clientX - rect.left) / rect.width, (clientY - rect.top) / rect.height);
     setPoints((current) => current.map((point) => (point.id === id ? { ...point, ...next } : point)));
-  };
+  }, [clampRatioPoint]);
+
+  const updatePoint = useRafCallback(updatePointImmediate);
 
   const handleBoardClick = (event) => {
     if (event.target.closest("[data-constellation-point]")) return;
@@ -749,10 +811,12 @@ function ConstellationsPlayground({ resetSignal }) {
     const stop = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
     };
 
-    window.addEventListener("pointermove", move);
+    window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const sortedPoints = useMemo(() => [...points].sort((a, b) => a.id - b.id), [points]);
@@ -876,7 +940,7 @@ function SystemsPlayground({ resetSignal }) {
   const [links, setLinks] = useState(defaultLinks);
   const [newSystemName, setNewSystemName] = useState("");
   const [selectedNodes, setSelectedNodes] = useState([]);
-  const [boardSize, setBoardSize] = useState({ width: 640, height: 420 });
+  const boardSize = useBoardSize(boardRef);
   const [resetAnimating, setResetAnimating] = useState(false);
   const dragState = useRef({ moved: false, id: null, startX: 0, startY: 0, rect: null });
 
@@ -891,42 +955,31 @@ function SystemsPlayground({ resetSignal }) {
     return () => window.clearTimeout(timer);
   }, [resetSignal, defaultNodes, defaultLinks]);
 
-  useEffect(() => {
-    const board = boardRef.current;
-    if (!board) return;
 
-    const updateSize = () => {
-      const rect = board.getBoundingClientRect();
-      if (rect.width && rect.height) setBoardSize({ width: rect.width, height: rect.height });
-    };
-
-    updateSize();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateSize);
-      return () => window.removeEventListener("resize", updateSize);
-    }
-
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(board);
-    return () => observer.disconnect();
-  }, []);
-
-  const clampRatioPoint = (x, y) => ({
-    x: Math.min(Math.max(x, 0.08), 0.92),
-    y: Math.min(Math.max(y, 0.1), 0.9),
-  });
+  const clampRatioPoint = useCallback((x, y) => ({
+    x: clamp(x, 0.08, 0.92),
+    y: clamp(y, 0.1, 0.9),
+  }), []);
 
   const ratioToPixels = (position) => ({
     x: position.x * boardSize.width,
     y: position.y * boardSize.height,
   });
 
-  const updateNodeFromClient = useCallback((id, clientX, clientY, rectOverride) => {
+  const updateNodeFromClientImmediate = useCallback((id, clientX, clientY, rectOverride) => {
     const rect = rectOverride || boardRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next = clampRatioPoint((clientX - rect.left) / rect.width, (clientY - rect.top) / rect.height);
-    setNodePositions((current) => ({ ...current, [id]: next }));
-  }, []);
+    setNodePositions((current) => {
+      const currentPosition = current[id];
+      if (currentPosition && Math.abs(currentPosition.x - next.x) < 0.001 && Math.abs(currentPosition.y - next.y) < 0.001) {
+        return current;
+      }
+      return { ...current, [id]: next };
+    });
+  }, [clampRatioPoint]);
+
+  const updateNodeFromClient = useRafCallback(updateNodeFromClientImmediate);
 
   const linkKey = (a, b) => `${a}::${b}`;
 
@@ -969,10 +1022,12 @@ function SystemsPlayground({ resetSignal }) {
       dragState.current = { moved: false, id: null, startX: 0, startY: 0, rect: null };
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
     };
 
-    window.addEventListener("pointermove", move);
+    window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
   };
 
   const addSystem = () => {
