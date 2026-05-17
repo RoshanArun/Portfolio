@@ -37,7 +37,7 @@ const projects = [
   },
 ];
 
-const skills = ["Swift", "SwiftUI", "UIKit", "C++", "Djinni", "React", "TypeScript", "Next.js", "Tailwind CSS", "Redux", "MongoDB", "REST APIs"];
+const skills = ["Swift", "SwiftUI", "UIKit", "C++", "Djinni", "React", "Vue", "TypeScript", "Next.js", "Tailwind CSS", "Redux", "REST APIs"];
 
 const skillCards = [
   {
