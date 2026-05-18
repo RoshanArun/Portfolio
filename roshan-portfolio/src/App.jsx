@@ -110,7 +110,7 @@ function LivingBackground() {
   );
 
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#05070c]">
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#080c14]">
       <motion.div
         animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
@@ -134,8 +134,8 @@ function LivingBackground() {
         />
       ))}
 
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,7,12,0.05),rgba(5,7,12,0.78)_82%,#05070c)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,7,12,0.20)_48%,rgba(5,7,12,0.95)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,12,20,0.05),rgba(8,12,20,0.78)_82%,#080c14)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,12,20,0.20)_48%,rgba(8,12,20,0.95)_100%)]" />
     </div>
   );
 }
@@ -205,7 +205,7 @@ function HologramCore() {
       <motion.div
         animate={prefersReducedMotion ? undefined : { y: [0, -16, 0], rotateX: [0, 8, 0], rotateY: [0, -8, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/15 bg-[#070b12]/70 p-5 shadow-2xl shadow-sky-500/10 backdrop-blur-2xl"
+        className="absolute left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/15 bg-[#0b1220]/70 p-5 shadow-2xl shadow-sky-500/10 backdrop-blur-2xl"
       >
         <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-sky-400/12 via-transparent to-white/5" />
         <div className="relative">
@@ -217,7 +217,7 @@ function HologramCore() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
               <div className="mb-3 flex items-center justify-between text-xs text-slate-400">
                 <span>interface.quality</span>
                 <span className="text-sky-300">99%</span>
@@ -242,7 +242,7 @@ function HologramCore() {
                   key={item}
                   animate={{ x: [0, 5, 0], opacity: [0.72, 1, 0.72] }}
                   transition={{ duration: 3, delay: index * 0.25, repeat: Infinity, ease: "easeInOut" }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-black text-white"
+                  className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-black text-white"
                 >
                   <span className="mr-3 text-sky-300">0{index + 1}</span>{item}
                 </motion.div>
@@ -272,7 +272,7 @@ function FloatingPanels() {
           initial={{ opacity: 0, y: 20, rotate: panel.rotate }}
           animate={prefersReducedMotion ? { opacity: 0.62, y: 0, rotate: panel.rotate } : { opacity: 0.62, y: [0, -12, 0], rotate: [panel.rotate, panel.rotate + 1.5, panel.rotate] }}
           transition={{ opacity: { delay: panel.delay, duration: 1 }, y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay }, rotate: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: panel.delay } }}
-          className="absolute rounded-2xl border border-sky-300/15 bg-[#070b12]/55 px-5 py-3 font-mono text-xs text-sky-100 shadow-2xl shadow-black/30 backdrop-blur-xl"
+          className="absolute rounded-2xl border border-sky-300/15 bg-[#0b1220]/55 px-5 py-3 font-mono text-xs text-sky-100 shadow-2xl shadow-black/10 backdrop-blur-xl"
           style={{ top: panel.top, left: panel.left }}
         >
           {panel.text}
@@ -290,7 +290,7 @@ function MagneticButton({ children, href, variant = "primary" }) {
       whileTap={{ scale: 0.97 }}
       className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black uppercase tracking-wide transition-all duration-300 ${
         variant === "primary"
-          ? "bg-white text-[#05070c] shadow-2xl shadow-sky-400/20 hover:bg-sky-200"
+          ? "bg-white text-[#080c14] shadow-2xl shadow-sky-400/20 hover:bg-sky-200"
           : "border border-white/15 bg-white/5 text-white backdrop-blur hover:border-sky-300/50 hover:bg-white/10"
       }`}
     >
@@ -307,9 +307,9 @@ function Navbar() {
 
   return (
     <motion.nav initial={{ y: -80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }} className="fixed left-0 right-0 top-0 z-50 px-4 py-4">
-      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-[#070b12]/70 px-5 py-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-[#0b1220]/70 px-5 py-3 shadow-2xl shadow-black/10 backdrop-blur-xl">
         <a href="#home" className="flex items-center gap-3 text-white">
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-white font-black text-[#05070c] shadow-lg shadow-sky-400/20">RA</div>
+          <div className="grid h-9 w-9 place-items-center rounded-full bg-white font-black text-[#080c14] shadow-lg shadow-sky-400/20">RA</div>
           <span className="hidden text-sm font-semibold tracking-wide sm:block">Roshan Arun</span>
         </a>
 
@@ -321,7 +321,7 @@ function Navbar() {
           ))}
         </div>
 
-        <a href="mailto:Roshan.arun@live.com" className="hidden rounded-full bg-white px-4 py-2 text-sm font-black text-[#05070c] transition hover:bg-sky-200 md:block">
+        <a href="mailto:Roshan.arun@live.com" className="hidden rounded-full bg-white px-4 py-2 text-sm font-black text-[#080c14] transition hover:bg-sky-200 md:block">
           Contact Me
         </a>
 
@@ -332,7 +332,7 @@ function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mx-auto mt-3 max-w-7xl rounded-3xl border border-white/10 bg-[#070b12]/95 p-4 backdrop-blur-xl md:hidden">
+          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="mx-auto mt-3 max-w-7xl rounded-3xl border border-white/10 bg-[#0b1220]/95 p-4 backdrop-blur-xl md:hidden">
             {links.map((link) => (
               <a key={link} href={`#${link}`} onClick={() => setOpen(false)} className="block rounded-2xl px-4 py-3 text-slate-200 hover:bg-white/10">
                 {link.charAt(0).toUpperCase() + link.slice(1)}
@@ -382,7 +382,7 @@ function Hero() {
 }
 
 function SectionBridge() {
-  return <div className="pointer-events-none absolute -top-56 left-0 right-0 h-[28rem] bg-[linear-gradient(to_bottom,transparent_0%,rgba(5,7,12,0.28)_45%,transparent_100%)]" />;
+  return <div className="pointer-events-none absolute -top-56 left-0 right-0 h-[28rem] bg-[linear-gradient(to_bottom,transparent_0%,rgba(8,12,20,0.28)_45%,transparent_100%)]" />;
 }
 
 const SectionHeader = React.memo(function SectionHeader({ eyebrow, title, description }) {
@@ -408,7 +408,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }) {
       viewport={{ once: true, amount: 0.18 }}
       transition={{ duration: 0.55, delay: index * 0.04 }}
       whileHover={canHover ? { y: -12, scale: 1.015 } : undefined}
-      className="group relative transform-gpu overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 backdrop-blur transition-colors duration-300 md:hover:border-sky-300/35 md:hover:bg-white/[0.055] md:hover:shadow-sky-950/30"
+      className="group relative transform-gpu overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-2xl shadow-black/10 backdrop-blur transition-colors duration-300 md:hover:border-sky-300/35 md:hover:bg-white/[0.065] md:hover:shadow-sky-950/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity duration-500 md:group-hover:opacity-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.16),transparent_45%)]" />
@@ -423,7 +423,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }) {
         <p className="mt-4 min-h-28 leading-7 text-slate-400">{project.description}</p>
         <div className="mt-7 flex flex-wrap gap-2">
           {project.tech.map((item) => (
-            <span key={item} className="rounded-full bg-[#05070c]/70 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10 transition md:group-hover:ring-sky-300/20">{item}</span>
+            <span key={item} className="rounded-full bg-[#080c14]/70 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10 transition md:group-hover:ring-sky-300/20">{item}</span>
           ))}
         </div>
       </div>
@@ -469,13 +469,13 @@ const SkillFlipCard = React.memo(function SkillFlipCard({ item, index }) {
         transition={flipTransition}
         className="relative h-full rounded-[2rem] will-change-transform [backface-visibility:hidden] [transform-style:preserve-3d] [transform:translateZ(0)]"
       >
-        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.035] p-7 shadow-2xl shadow-black/20 backdrop-blur transition-colors duration-500 group-hover:border-sky-300/35 group-hover:bg-white/[0.055] group-hover:shadow-sky-950/30 [backface-visibility:hidden] [transform:rotateY(0deg)_translateZ(1px)]">
+        <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-2xl shadow-black/10 backdrop-blur transition-colors duration-500 group-hover:border-sky-300/35 group-hover:bg-white/[0.065] group-hover:shadow-sky-950/30 [backface-visibility:hidden] [transform:rotateY(0deg)_translateZ(1px)]">
           <Icon className="mb-6 h-8 w-8 text-sky-300 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
           <h3 className="text-xl font-black text-white">{item.title}</h3>
           <p className="mt-4 leading-7 text-slate-400">{item.front}</p>
           <p className="mt-5 text-sm font-bold uppercase tracking-[0.2em] text-sky-300/80">Click to flip</p>
         </div>
-        <div className="absolute inset-0 rounded-[2rem] border border-sky-300/20 bg-[#0b1220]/90 p-7 shadow-2xl shadow-sky-950/30 backdrop-blur [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]">
+        <div className="absolute inset-0 rounded-[2rem] border border-sky-300/20 bg-[#111d32]/90 p-7 shadow-2xl shadow-sky-950/30 backdrop-blur [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]">
           <h3 className="text-xl font-black text-white">How I use it</h3>
           <p className="mt-5 leading-7 text-slate-300">{item.back}</p>
           <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-sky-300/80">Click to return</p>
@@ -494,10 +494,10 @@ function Skills() {
       <div className="relative z-10">
         <SectionHeader eyebrow="Stack" title="The tools behind the build." description="Mobile, web, UI systems, API integration, and performance-focused development." />
         <div className="relative mx-auto max-w-7xl overflow-hidden">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#05070c] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#05070c] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#080c14] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#080c14] to-transparent" />
           <motion.div animate={prefersReducedMotion ? undefined : { x: [0, -1300] }} transition={{ duration: 24, repeat: Infinity, ease: "linear" }} className="flex w-max gap-4 px-6 will-change-transform">
-            {repeated.map((skill, index) => <div key={`${skill}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-4 text-lg font-black text-white shadow-xl shadow-black/20">{skill}</div>)}
+            {repeated.map((skill, index) => <div key={`${skill}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.045] px-6 py-4 text-lg font-black text-white shadow-xl shadow-black/10">{skill}</div>)}
           </motion.div>
         </div>
 
@@ -647,19 +647,19 @@ function MotionPlayground({ resetSignal }) {
       return "grid h-[5.6rem] w-[5.6rem] place-items-center rounded-full border border-sky-300/20 bg-sky-300/10 text-[10px] font-black uppercase tracking-[0.14em] text-sky-100 shadow-2xl shadow-sky-950/30 backdrop-blur sm:h-[7.65rem] sm:w-[7.65rem] sm:text-[11px]";
     }
     if (shape === "panel") {
-      return "min-h-[5.25rem] w-[6.35rem] rounded-[1.25rem] border border-sky-300/20 bg-[#0b1220]/90 text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:min-h-[5.25rem] sm:w-[8.5rem] sm:rounded-[1.5rem] sm:text-xs";
+      return "min-h-[5.25rem] w-[6.35rem] rounded-[1.25rem] border border-sky-300/20 bg-[#111d32]/90 text-[10px] font-black text-white shadow-2xl shadow-black/10 backdrop-blur sm:min-h-[5.25rem] sm:w-[8.5rem] sm:rounded-[1.5rem] sm:text-xs";
     }
     if (shape === "wide") {
-      return "rounded-2xl border border-sky-300/20 bg-[#0b1220]/90 px-3 py-3 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:px-5 sm:py-4 sm:text-sm";
+      return "rounded-2xl border border-sky-300/20 bg-[#111d32]/90 px-3 py-3 text-xs font-black text-white shadow-2xl shadow-black/10 backdrop-blur sm:px-5 sm:py-4 sm:text-sm";
     }
     if (shape === "bars") {
-      return "rounded-[1.35rem] border border-sky-300/20 bg-[#0b1220]/90 px-2.5 py-2 text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:rounded-[1.7rem] sm:px-3.5 sm:py-3 sm:text-[11px]";
+      return "rounded-[1.35rem] border border-sky-300/20 bg-[#111d32]/90 px-2.5 py-2 text-[10px] font-black text-white shadow-2xl shadow-black/10 backdrop-blur sm:rounded-[1.7rem] sm:px-3.5 sm:py-3 sm:text-[11px]";
     }
-    return "grid h-[4.7rem] w-[4.7rem] place-items-center rounded-full border border-sky-300/20 bg-[#0b1220]/90 text-xs font-black text-white shadow-2xl shadow-black/40 backdrop-blur sm:h-[5.75rem] sm:w-[5.75rem] sm:text-sm";
+    return "grid h-[4.7rem] w-[4.7rem] place-items-center rounded-full border border-sky-300/20 bg-[#111d32]/90 text-xs font-black text-white shadow-2xl shadow-black/10 backdrop-blur sm:h-[5.75rem] sm:w-[5.75rem] sm:text-sm";
   };
 
   return (
-    <div className="relative z-10 h-[510px] overflow-visible rounded-[1.5rem] border border-white/10 bg-black/20 sm:h-full sm:min-h-[430px] sm:rounded-[2rem]">
+    <div className="relative z-10 h-[510px] overflow-visible rounded-[1.5rem] border border-white/10 bg-white/[0.045] sm:h-full sm:min-h-[430px] sm:rounded-[2rem]">
       <motion.div animate={prefersReducedMotion ? undefined : { rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} className="absolute left-[45%] top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-sky-300/15 sm:left-[43%] sm:h-64 sm:w-64" />
       <motion.div animate={prefersReducedMotion ? undefined : { rotate: -360 }} transition={{ duration: 54, repeat: Infinity, ease: "linear" }} className="absolute left-[45%] top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:left-[43%] sm:h-44 sm:w-44" />
 
@@ -672,7 +672,7 @@ function MotionPlayground({ resetSignal }) {
       <DraggableToy
         resetSignal={resetSignal}
         initial={{ left: isSmallScreen ? "15%" : "21%", top: isSmallScreen ? "45%" : "40%" }}
-        className="w-[68%] max-w-xs rounded-2xl border border-white/10 bg-[#080c14]/85 p-3 font-mono text-[10px] leading-5 text-slate-300 shadow-2xl shadow-black/30 backdrop-blur sm:w-[44%] sm:max-w-md sm:p-5 sm:text-sm"
+        className="w-[68%] max-w-xs rounded-2xl border border-white/10 bg-[#0d1422]/85 p-3 font-mono text-[10px] leading-5 text-slate-300 shadow-2xl shadow-black/10 backdrop-blur sm:w-[44%] sm:max-w-md sm:p-5 sm:text-sm"
       >
         <p><span className="text-sky-300">motion</span>.play(&#123; magnet, orbit, ease, signal, ripple &#125;);</p>
       </DraggableToy>
@@ -788,13 +788,13 @@ function ConstellationsPlayground({ resetSignal }) {
         .line-dash-flow { animation: lineDashFlow 2.6s linear infinite; }
         @keyframes lineDashFlow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -36; } }
       `}</style>
-      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
+      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-sky-300 sm:text-xs sm:tracking-[0.25em]">constellations</p>
         <h4 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">Draw your own star map</h4>
         <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base sm:leading-7">
           Click the sky to drop a point. Drag any star to redesign the constellation.
         </p>
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-3 font-mono text-xs text-slate-300 sm:mt-8 sm:p-4 sm:text-sm">
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.05] p-3 font-mono text-xs text-slate-300 sm:mt-8 sm:p-4 sm:text-sm">
           <span className="text-sky-300">stars</span>.connect({points.length});
         </div>
         <button
@@ -806,7 +806,7 @@ function ConstellationsPlayground({ resetSignal }) {
         </button>
       </div>
 
-      <div ref={boardRef} onClick={handleBoardClick} className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 p-3 [touch-action:none] sm:h-[420px] sm:rounded-[2rem] sm:p-5 lg:h-full lg:min-h-[360px]">
+      <div ref={boardRef} onClick={handleBoardClick} className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-3 [touch-action:none] sm:h-[420px] sm:rounded-[2rem] sm:p-5 lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(125,211,252,0.13),transparent_18%),radial-gradient(circle_at_70%_70%,rgba(255,255,255,0.08),transparent_24%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible opacity-90">
           {sortedPoints.slice(1).map((point, index) => {
@@ -862,8 +862,8 @@ const SystemsNode = React.memo(function SystemsNode({ node, pixel, onStartDrag, 
       initial={false}
       animate={{ left: pixel.x, top: pixel.y }}
       transition={resetAnimating ? springResetTransition : { duration: 0 }}
-      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/40 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
-        selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#0b1220]/90"
+      className={`absolute z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab select-none place-items-center rounded-full border px-2 text-center text-[10px] font-black text-white shadow-2xl shadow-black/10 backdrop-blur active:cursor-grabbing [touch-action:none] sm:h-20 sm:w-20 sm:px-3 sm:text-xs ${
+        selected ? "border-sky-200/80 bg-sky-300/25 ring-4 ring-sky-300/20" : "border-sky-300/20 bg-[#111d32]/90"
       }`}
     >
       <span className="line-clamp-2 leading-tight">{children}</span>
@@ -1096,14 +1096,14 @@ function SystemsPlayground({ resetSignal }) {
         .system-name-input { color-scheme: dark; }
         @keyframes systemsLineDashFlow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -44; } }
       `}</style>
-      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-black/20 p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
+      <div className="systems-scroll hidden min-h-0 rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-4 sm:block sm:rounded-[2rem] sm:p-5 lg:overflow-auto">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-sky-300 sm:text-xs sm:tracking-[0.25em]">systems</p>
         <h4 className="mt-2 text-xl font-black sm:mt-3 sm:text-2xl">Build the architecture map</h4>
         <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base sm:leading-7">
           Add named systems, drag nodes, then click two nodes to create or remove directed flows between them.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:mt-7 sm:p-4">
+        <form onSubmit={handleSubmit} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:mt-7 sm:p-4">
           <label className="text-xs font-black uppercase tracking-[0.22em] text-slate-400" htmlFor="system-name">New system name</label>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <div className="relative min-w-0 flex-1">
@@ -1114,14 +1114,14 @@ function SystemsPlayground({ resetSignal }) {
                 placeholder="Auth, Cache, DB..."
                 autoComplete="off"
                 spellCheck="false"
-                className="system-name-input w-full rounded-full border border-white/10 bg-black/25 px-4 py-2 pr-10 text-sm text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
+                className="system-name-input w-full rounded-full border border-white/10 bg-white/[0.055] px-4 py-2 pr-10 text-sm text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
               />
               {newSystemName && (
                 <button
                   type="button"
                   aria-label="Clear system name"
                   onClick={() => setNewSystemName("")}
-                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
+                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.07] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
                 >
                   ×
                 </button>
@@ -1136,7 +1136,7 @@ function SystemsPlayground({ resetSignal }) {
           </div>
         </form>
 
-        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:mt-4 sm:p-4">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.05] p-3 sm:mt-4 sm:p-4">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Connections</p>
           <p className="mt-2 text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
             Tap a source node, then a destination node to toggle that flow.
@@ -1160,7 +1160,7 @@ function SystemsPlayground({ resetSignal }) {
                 key={linkKey(from, to)}
                 type="button"
                 onClick={() => removeLink(from, to)}
-                className="mr-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-slate-300 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
+                className="mr-2 rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-xs text-slate-300 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
                 title="Click to remove this connection"
               >
                 {labelFor(from)} → {labelFor(to)} ×
@@ -1171,7 +1171,7 @@ function SystemsPlayground({ resetSignal }) {
 
       </div>
 
-      <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-3 sm:hidden">
+      <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-3 sm:hidden">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <div className="relative min-w-0 flex-1">
             <input
@@ -1180,14 +1180,14 @@ function SystemsPlayground({ resetSignal }) {
               placeholder="New system name"
               autoComplete="off"
               spellCheck="false"
-              className="system-name-input w-full rounded-full border border-white/10 bg-black/25 px-3 py-2 pr-9 text-xs text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
+              className="system-name-input w-full rounded-full border border-white/10 bg-white/[0.055] px-3 py-2 pr-9 text-xs text-white outline-none placeholder:text-slate-500 focus:border-sky-300/45"
             />
             {newSystemName && (
               <button
                 type="button"
                 aria-label="Clear system name"
                 onClick={() => setNewSystemName("")}
-                className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
+                className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/[0.07] text-xs font-black text-slate-300 transition hover:border-sky-300/30 hover:bg-sky-300/15 hover:text-white"
               >
                 ×
               </button>
@@ -1200,14 +1200,14 @@ function SystemsPlayground({ resetSignal }) {
         <p className="mt-2 text-center text-[11px] leading-5 text-slate-400">Tap source, then destination to toggle that flow. Tap a chip below to remove it.</p>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {links.map(([from, to]) => (
-            <button key={linkKey(from, to)} type="button" onClick={() => removeLink(from, to)} className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] text-slate-300">
+            <button key={linkKey(from, to)} type="button" onClick={() => removeLink(from, to)} className="shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[11px] text-slate-300">
               {labelFor(from)} → {labelFor(to)} ×
             </button>
           ))}
         </div>
       </div>
 
-      <div ref={boardRef} data-systems-board className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/20 [touch-action:none] sm:h-[430px] sm:rounded-[2rem] lg:h-full lg:min-h-[360px]">
+      <div ref={boardRef} data-systems-board className="relative h-[430px] min-h-[380px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.045] [touch-action:none] sm:h-[430px] sm:rounded-[2rem] lg:h-full lg:min-h-[360px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(125,211,252,0.10),transparent_20%),radial-gradient(circle_at_72%_70%,rgba(255,255,255,0.07),transparent_25%)]" />
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden opacity-80">
           {linkSegments.map((linkItem, index) => (
@@ -1263,12 +1263,12 @@ function SystemsPlayground({ resetSignal }) {
 
       <div className="hidden gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center lg:col-span-2 lg:grid lg:grid-cols-[0.82fr_1.18fr] lg:gap-6">
         <div className="flex justify-center">
-          <div className="rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 font-mono text-xs text-slate-300 backdrop-blur">
+          <div className="rounded-full border border-white/10 bg-white/[0.055] px-4 py-2 font-mono text-xs text-slate-300 backdrop-blur">
             <span className="text-sky-300">systems</span>.count({nodes.length}); <span className="text-sky-300">links</span>.count({links.length});
           </div>
         </div>
         <div className="flex justify-center">
-          <div className="rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-center text-xs font-semibold text-slate-300 backdrop-blur">
+          <div className="rounded-full border border-white/10 bg-white/[0.055] px-4 py-2 text-center text-xs font-semibold text-slate-300 backdrop-blur">
             <span className="text-white">System mode:</span> drag nodes like stars · click source then destination to toggle a flow
           </div>
         </div>
@@ -1405,7 +1405,7 @@ function Toybox() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
-          className={`relative mx-auto flex flex-col overflow-visible rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/40 backdrop-blur-xl sm:rounded-[2.5rem] sm:p-6 ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
+          className={`relative mx-auto flex flex-col overflow-visible rounded-[1.75rem] border border-white/10 bg-white/[0.045] p-4 shadow-2xl shadow-black/10 backdrop-blur-xl sm:rounded-[2.5rem] sm:p-6 ${sizeResetAnimating ? "transition-[width,height] duration-500 ease-out" : ""}`}
           style={{
             width: isSmallScreen ? "100%" : playboxSize.width,
             maxWidth: isSmallScreen ? "calc(100vw - 32px)" : "calc(100vw - 48px)",
@@ -1452,7 +1452,7 @@ function Toybox() {
               <button
                 type="button"
                 onClick={() => setResetSignal((value) => value + 1)}
-                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#05070c] transition hover:bg-sky-200 sm:px-3.5 sm:text-xs sm:tracking-[0.16em]"
+                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#080c14] transition hover:bg-sky-200 sm:px-3.5 sm:text-xs sm:tracking-[0.16em]"
               >
                 Reset
               </button>
@@ -1493,7 +1493,7 @@ function Toybox() {
           </button>
         </motion.div>
 
-        <p className="mx-auto mt-4 w-fit max-w-[calc(100%-2rem)] rounded-full border border-white/10 bg-white/[0.055] px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 shadow-xl shadow-black/20 backdrop-blur sm:text-[11px]">
+        <p className="mx-auto mt-4 w-fit max-w-[calc(100%-2rem)] rounded-full border border-white/10 bg-white/[0.065] px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 shadow-xl shadow-black/10 backdrop-blur sm:text-[11px]">
           Desktop: drag corner to resize · double-click to reset. Mobile: touch-friendly layout.
         </p>
       </div>
@@ -1510,8 +1510,8 @@ function Experience() {
         <div className="mx-auto max-w-4xl">
           {experience.map((item, index) => (
             <motion.div key={item.role} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.65, delay: index * 0.1 }} className="relative border-l border-white/10 pb-12 pl-8 last:pb-0">
-              <div className="absolute -left-3 top-0 grid h-6 w-6 place-items-center rounded-full bg-sky-300 shadow-lg shadow-sky-300/30"><div className="h-2 w-2 rounded-full bg-[#05070c]" /></div>
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/20">
+              <div className="absolute -left-3 top-0 grid h-6 w-6 place-items-center rounded-full bg-sky-300 shadow-lg shadow-sky-300/30"><div className="h-2 w-2 rounded-full bg-[#080c14]" /></div>
+              <div className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-2xl shadow-black/10">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <h3 className="text-2xl font-black text-white">{item.role}</h3>
                   <p className="text-sm font-semibold text-sky-200">{item.date}</p>
@@ -1531,12 +1531,12 @@ function Contact() {
   return (
     <section id="contact" className={`relative overflow-hidden px-6 pt-[4.5rem] pb-9 text-white sm:py-32 ${sectionVisibilityClass}`}>
       <SectionBridge />
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative z-10 mx-auto max-w-5xl rounded-[2.5rem] border border-white/10 bg-[#070b12]/70 p-8 text-center shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-14">
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative z-10 mx-auto max-w-5xl rounded-[2.5rem] border border-white/10 bg-[#0b1220]/70 p-8 text-center shadow-2xl shadow-black/10 backdrop-blur-xl sm:p-14">
         <Rocket className="mx-auto mb-6 h-10 w-10 text-sky-300" />
         <h2 className="text-4xl font-black tracking-tight sm:text-6xl">Ready to build something memorable?</h2>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-300">I’m open to web projects, frontend work, mobile development opportunities, and client-focused website updates.</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <a href="mailto:Roshan.arun@live.com" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-black text-[#05070c] transition hover:bg-sky-200"><Mail className="h-4 w-4" /> Email Me</a>
+          <a href="mailto:Roshan.arun@live.com" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-black text-[#080c14] transition hover:bg-sky-200"><Mail className="h-4 w-4" /> Email Me</a>
           <a href="https://github.com/RoshanArun" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><span className="text-base">⌘</span> GitHub</a>
           <a href="https://www.linkedin.com/in/roshan-arun-231a131b5/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><span className="text-base font-bold">in</span> LinkedIn</a>
         </div>
@@ -1554,8 +1554,8 @@ function ProgressBar() {
 export default function App() {
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
-    document.documentElement.style.backgroundColor = "#05070c";
-    document.body.style.backgroundColor = "#05070c";
+    document.documentElement.style.backgroundColor = "#080c14";
+    document.body.style.backgroundColor = "#080c14";
     document.body.style.margin = "0";
     document.body.style.overscrollBehaviorX = "none";
 
@@ -1579,7 +1579,7 @@ export default function App() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#05070c] font-sans selection:bg-sky-300 selection:text-[#05070c]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#080c14] font-sans selection:bg-sky-300 selection:text-[#080c14]">
       <LivingBackground />
       <ProgressBar />
       <Navbar />
