@@ -12,8 +12,8 @@ import Contact from "./sections/Contact";
 export default function App() {
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
-    document.documentElement.style.backgroundColor = "#080c14";
-    document.body.style.backgroundColor = "#080c14";
+    document.documentElement.style.backgroundColor = "#0b0f19";
+    document.body.style.backgroundColor = "#0b0f19";
     document.body.style.margin = "0";
     document.body.style.overscrollBehaviorX = "none";
 
@@ -37,7 +37,7 @@ export default function App() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#080c14] font-sans selection:bg-sky-300 selection:text-[#080c14]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#0b0f19] font-sans selection:bg-sky-300 selection:text-[#080c14]">
       <LivingBackground />
       <ProgressBar />
       <Navbar />

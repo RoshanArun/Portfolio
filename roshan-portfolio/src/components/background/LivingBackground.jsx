@@ -21,7 +21,7 @@ export default function LivingBackground() {
   );
 
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#080c14]">
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#0b0f19]">
       <motion.div
         animate={prefersReducedMotion ? undefined : { backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
@@ -45,7 +45,7 @@ export default function LivingBackground() {
         />
       ))}
 
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,12,20,0.05),rgba(8,12,20,0.78)_82%,#080c14)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,12,20,0.05),rgba(8,12,20,0.78)_82%,#0b0f19)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,12,20,0.20)_48%,rgba(8,12,20,0.95)_100%)]" />
     </div>
   );
