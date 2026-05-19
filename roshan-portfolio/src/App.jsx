@@ -157,7 +157,7 @@ function NetworkMap() {
             key={line}
             d={line}
             fill="none"
-            stroke={index === 1 ? "rgba(255,255,255,0.14)" : "rgba(56,189,248,0.20)"}
+            stroke={index === 1 ? "rgba(255,255,255,0.24)" : "rgba(56,189,248,0.30)"}
             strokeWidth={index === 3 ? "0.9" : "1.2"}
             strokeDasharray="9 16"
             initial={{ pathLength: 0 }}
