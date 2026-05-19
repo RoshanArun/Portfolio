@@ -19,12 +19,12 @@ export const projects = [
     link: "#",
   },
   {
-    title: "CrypNet",
-    type: "Crypto Platform",
+    title: "DevFlow",
+    type: "Mock Dashboard",
     description:
-      "A responsive crypto application with UI structure, state management, routing, backend planning, and authentication architecture.",
-    tech: ["React", "Ionic", "Redux", "MongoDB", "TypeScript"],
-    link: "https://github.com/RoshanArun/CrypNet-WebApp",
+      "A mock dashboard for freelancers, designers, and developers to manage clients, projects, invoices, deadlines, revisions, and income.",
+    tech: ["React", "Tailwind", "UI/UX", "HTML/CSS"],
+    link: "https://roshanarun.github.io/DevFlow/",
   },
   {
     title: "EMTO Web App",
