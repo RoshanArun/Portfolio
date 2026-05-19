@@ -1,5 +1,3 @@
-# Roshan Arun — Portfolio
-
 Website
 - https://roshanarun.github.io/Portfolio/
 
@@ -13,7 +11,3 @@ Quick local run
 1. cd roshan-portfolio
 2. npm install
 3. npm run dev
-
-Important
-- Edit project cards: roshan-portfolio/src/data/portfolio.js
-- Contact: Roshan.arun@live.com
