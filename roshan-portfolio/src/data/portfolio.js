@@ -22,7 +22,7 @@ export const projects = [
     title: "DevFlow",
     type: "Mock Dashboard",
     description:
-      "A mock dashboard for freelancers, designers, and developers to manage clients, projects, invoices, deadlines, revisions, and income.",
+      "A mock dashboard for freelancers, designers, and developers to manage clients, projects, invoices, deadlines, revisions, and income." ,
     tech: ["React", "Tailwind", "UI/UX", "HTML/CSS"],
     link: "https://roshanarun.github.io/DevFlow/",
   },
