@@ -11,20 +11,20 @@ export const projects = [
     link: "https://github.com/RoshanArun/FoodTruck-Financial-Platform",
   },
   {
+    title: "DevFlow",
+    type: "Mock Dashboard",
+    description:
+      "A mock dashboard for freelancers, designers, and developers to manage clients, projects, invoices, deadlines, revisions, and income.",
+    tech: ["React", "Tailwind", "UI/UX", "HTML/CSS"],
+    link: "https://roshanarun.github.io/DevFlow/",
+  },
+  {
     title: "Garmin Drive Retheme",
     type: "Mobile UI System",
     description:
       "A scalable retheming system using Swift and C++ to support dark/light mode, reactive UI behavior, and reusable mobile interface infrastructure.",
     tech: ["Swift", "C++", "SwiftUI", "Djinni"],
     link: "#",
-  },
-  {
-    title: "DevFlow",
-    type: "Mock Dashboard",
-    description:
-      "A mock dashboard for freelancers, designers, and developers to manage clients, projects, invoices, deadlines, revisions, and income." ,
-    tech: ["React", "Tailwind", "UI/UX", "HTML/CSS"],
-    link: "https://roshanarun.github.io/DevFlow/",
   },
   {
     title: "EMTO Web App",
